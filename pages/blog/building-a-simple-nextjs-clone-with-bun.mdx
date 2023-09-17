@@ -1,0 +1,86 @@
+import { Intro } from "../../components/Intro";
+
+<Intro>{`
+  This website is built using a simple Next.JS clone built in Bun. I made this
+  because I wanted to try out Bun and because I wanted a new design for my
+  website. My previous site is build in Next.JS. I really like working with
+  Next.JS. It is easy to create fast sites, and because it is used a lot, there
+  are also a lot of resources available. But I want to create something more
+  bare bones, something I understand every part of, and something that is even
+  faster...
+`}</Intro>
+
+A few features I wanted my blog to have:
+
+- Next.JS style routing, which is built-in Bun ([FileSystemRouter](https://bun.sh/docs/api/file-system-router))
+- Server side rendered pages that are hydrated on the frontend
+- Ridiculous fast routing in the frontend
+- I want to be able to use ReScript
+- Built and served in Bun
+- Overall a very, very fast website
+
+## The Server
+
+This site has its own custom server using Bun.serve. The server receives a requests, and handles it for different situations. First the request is checked against the router. Because it is a Bun router and Bun server, you can just pass the request to the router and your done. All you have to do is:
+
+```ts
+const router = new Bun.FileSystemRouter({
+  style: "nextjs",
+  dir: "./pages",
+  origin: "http://localhost:3000",
+  assetPrefix: "pages/",
+});
+
+Bun.serve({
+  port: 3000,
+  async fetch(request) {
+    const match = router.match(request);
+  },
+});
+
+// MatchedRoute {
+//   filePath: "/Users/xyz/pages/alice.tsx",
+//   kind: "exact",
+//   name: "/alice",
+//   params: {},
+//   pathname: "/alice",
+//   query: {},
+//   scriptSrc: "http://localhost:3000/pages/alice.tsx",
+//   src: "http://localhost:3000/pages/alice.tsx"
+// }
+```
+
+If there is no match we read files from two folders. Any images or CSS files from the public folder, the other folder I will explain later.
+
+Responding with a file also easy. `Bun.file(pathToFile)` will create a `BunFile` object, this object has different functions for reading and writing files. However, you can also just pass it to `Response` and return it in the `fetch` handler for it to be served. This will also handle mime type, so you don't have to worry about that.
+
+```ts
+const headers = new Headers();
+headers.append("Cache-Control", "public, max-age=604800, immutable");
+return new Response(Bun.file(pathToFile), {
+  headers,
+});
+```
+
+Ben when there _is_ a match, that page should be served of course. The route already provides the path to the source file of that route. In the example above, it will give a path to alice.tsx. Using the import function this file can be imported, and the default exported component can be rendered using the `preact-render-to-string` package.
+
+```tsx
+const App = await import(match.filePath);
+const rendered = render(
+  // The RootLayout component includes the html, head and body tags. With a container that
+  // will be hydrated later. The pageInfo object will be rendered in a script tag for later use.
+  <RootLayout pageInfo={getPageInfo(match)}>
+    <App />
+  </RootLayout>
+);
+```
+
+And since Bun has support for TSX, we can just use JSX components in the server file. This also allows us to create a "template" file for the root layout. In create-react-app apps you had to do this using an index.html file with some template strings, this is much more flexible. By calling the render function we end up with a rendered page, which we can send as response, and we're done. Now we have a server side rendered static site, which is already fine. It's very fast (we mostly used a bunch of built-in functions) and was straightforward and easy to implement.
+
+## The Client
+
+But I also want to continue my code on the client. In my next post I will describe how I solved routing and hydrating in the frontend.
+
+export const config = {
+  title: "Building a simple Next.JS clone with Bun.",
+};

@@ -1,0 +1,27 @@
+{
+  "name": "corne-info-astro",
+  "sources": [
+    {
+      "dir": "src/rescript",
+      "subdirs": true
+    }
+  ],
+  "package-specs": [
+    {
+      "module": "es6",
+      "in-source": true
+    }
+  ],
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+    "@rescript/react",
+    "@glennsl/rescript-json-combinators",
+    "@glennsl/rescript-fetch",
+    "@opendevtools/rescript-intl",
+    "@ryyppy/rescript-promise"
+  ],
+  "jsx": {
+    "version": 4,
+    "mode": "classic"
+  }
+}
