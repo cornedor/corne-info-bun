@@ -2,7 +2,23 @@
   "name": "corne-info-astro",
   "sources": [
     {
-      "dir": "src/rescript",
+      "dir": "rescript",
+      "subdirs": true
+    },
+    {
+      "dir": "layouts",
+      "subdirs": true
+    },
+    {
+      "dir": "pages",
+      "subdirs": true
+    },
+    {
+      "dir": "server",
+      "subdirs": true
+    },
+    {
+      "dir": "client",
       "subdirs": true
     }
   ],
@@ -12,16 +28,33 @@
       "in-source": true
     }
   ],
-  "suffix": ".bs.js",
+  "suffix": ".js",
   "bs-dependencies": [
     "@rescript/react",
     "@glennsl/rescript-json-combinators",
     "@glennsl/rescript-fetch",
-    "@opendevtools/rescript-intl",
-    "@ryyppy/rescript-promise"
+    "@ryyppy/rescript-promise",
+    "rescript-webapi",
+    "@rescript/core",
+    "rescript-nodejs"
+  ],
+  "bsc-flags": [
+    "-open RescriptCore"
   ],
   "jsx": {
     "version": 4,
-    "mode": "classic"
+    "mode": "automatic"
+  },
+  "gentypeconfig": {
+    "language": "typescript",
+    "module": "es6",
+    "importPath": "relative",
+    "shims": {
+      "Jsx": "Jsx"
+    },
+    "debug": {
+      "all": false
+    },
+    "exportInterfaces": false
   }
 }

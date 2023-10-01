@@ -1,6 +1,5 @@
 import { signal } from "@preact/signals";
 import { VNode, hydrate, render } from "preact";
-import { BaseLayout } from "../layouts/BaseLayout";
 import { renderPage } from "../utils/renderPage";
 import { DevMode } from "../components/DevMode";
 

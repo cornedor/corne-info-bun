@@ -8,6 +8,7 @@ export interface PageConfig {
 
 export async function renderPage(source: string) {
   const { default: App, config, getProps } = await import(source);
+  console.log(source, App());
   const {
     useBaseLayout = true,
     title,
@@ -20,6 +21,8 @@ export async function renderPage(source: string) {
   }
 
   const ssrConfig = { statusCode } as const;
+
+  console.log(<App {...props} />);
 
   if (useBaseLayout) {
     return [

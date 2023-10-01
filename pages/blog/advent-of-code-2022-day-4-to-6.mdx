@@ -1,0 +1,47 @@
+---
+title: "Advent of Code 2022 Day 4 to 6"
+pubDate: 2022-12-05
+excerpt: >
+  Here are my Advent of Code 2022 solutions - Day 4 to 6
+layout: ../../layouts/BaseLayout.astro
+---
+
+import { Stacks } from "../../rescript/DayFiveRender";
+
+## Day 5
+
+... and day 5, this time with some visuals
+
+### Part 1 & 2
+
+{" "}
+
+<Stacks.make client:load />
+
+The stacks are rendered above, you can toggle between the CrateMover versions. Since I already
+moved whole stacks in the first part this was very easy to implement. The stacks are a array of lists.
+Each stack is a list, a list can easily be split up with:
+
+```rescript
+let grabFromStack = (stack: stack, amount: int) => {
+  let emptyStack: stack = list{}
+  switch Belt.List.splitAt(stack, amount) {
+  | Some(grabbed, rest) => (grabbed, rest)
+  | _ => (emptyStack, emptyStack)
+  }
+}
+```
+
+Crates are grabbed in chunks, and reversed for the old version.
+
+```rescript
+let sortGrabbedCrates = (stack: stack, version) =>
+  switch version {
+  | CM9000 => Belt.List.reverse(stack)
+  | CM9001 => stack
+  }
+```
+
+export const config = {
+  title: "Advent of Code 2022 Day 4 to 6",
+};

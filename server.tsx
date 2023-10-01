@@ -1,17 +1,18 @@
 import render from "preact-render-to-string";
 import path from "path";
-import RootLayout from "./server/RootLayout";
-import { MatchedRoute, Server, plugin } from "bun";
+import { make as RootLayout } from "./server/RootLayout.gen";
+import { MatchedRoute, plugin } from "bun";
 import { glob } from "glob";
-import { mdxPlugin } from "./plugins/MDXPlugin";
+// import { mdxPlugin } from "./plugins/MDXPlugin";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { renderPage } from "./utils/renderPage";
+import { mdxPlugin } from "./rescript/plugins/MDXPlugin";
 
 plugin(mdxPlugin);
 
 function rebuildFrontend() {
   console.log("Rebuild frontend");
-  glob("{pages,client}/**/*.{ts,tsx,mdx}").then((pages) =>
+  glob("{pages,client}/**/*.{ts,tsx,mdx,js}").then((pages) =>
     Bun.build({
       entrypoints: pages,
       outdir: "./_s",
@@ -43,13 +44,13 @@ function getPageInfo(match: MatchedRoute) {
     kind: match.kind,
     params: match.params,
     pathname: match.pathname,
-    quary: match.query,
+    query: match.query,
     src: frontendUrl.toString(),
   };
 }
 
 const server = Bun.serve({
-  port: 3000,
+  port: 3001,
   async fetch(request) {
     if (server.upgrade(request)) {
       return;

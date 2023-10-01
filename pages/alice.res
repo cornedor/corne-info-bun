@@ -1,14 +1,11 @@
-import { PageConfig } from "../utils/renderPage";
-
-export const config: PageConfig = {
-  title: "Alice in Wonderland",
-};
-
-export default function About() {
-  return (
-    <div class="p-4">
-      <div>
-        <pre class="mx-auto p-2 bg-slate-200 rounded w-[700px]">{`Alice's Adventures in Wonderland
+// @react.component
+let make: Page.makeFn = props => {
+  let pageProps = props["pageProps"]
+  <div className="p-4">
+    <div>
+      <code> {Js.Json.stringify(pageProps)->React.string} </code>
+      <pre className="mx-auto p-2 bg-slate-200 rounded w-[700px]">
+        {React.string(`Alice's Adventures in Wonderland
 
 ALICE'S ADVENTURES IN WONDERLAND
 
@@ -3607,8 +3604,15 @@ Wonderland of long ago:  and how she would feel with all their
 simple sorrows, and find a pleasure in all their simple joys,
 remembering her own child-life, and the happy summer days.
 
-             THE END`}</pre>
-      </div>
+             THE END`)}
+      </pre>
     </div>
-  );
+  </div>
+}
+
+let config: Page.pageConfig = {
+  title: "Alice in Wonderland",
+  getProps: async () => {
+    Js.Json.string("Server says: " ++ Float.toString(Math.random()))
+  },
 }

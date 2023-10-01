@@ -169,3 +169,5 @@ dist
 .pnp.\*
 
 /_s/
+/lib/
+*.js
