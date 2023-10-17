@@ -1,5 +1,5 @@
 @react.component
-type makeFn = {"pageProps": Js.Json.t} => React.element
+type makeFn = {"pageProps": option<Js.Json.t>} => React.element
 
 type getPropsFn = unit => promise<Js.Json.t>
 type pageConfig = {
@@ -22,7 +22,7 @@ type pageInfo = {
   src: string,
 }
 
-type ssrConfig = {statusCode: int, pageProps: Js.Json.t}
+type ssrConfig = {statusCode: int, pageProps: option<Js.Json.t>}
 
 external importPage: string => promise<option<pageModule>> = "import"
 
@@ -33,14 +33,16 @@ let getComponentWithBaseLayout = (children, config) => {
   }
 }
 
-let render = async (source: string) => {
+let render = async (source: string, isSsr: bool, pageProps: option<Js.Json.t>) => {
   switch await importPage(source) {
   | None => None
   | Some({make, config}) => {
-      let pageProps = switch config.getProps {
-      | Some(getProps) => await getProps()
-      | None => Js.Json.null
-      }
+      let pageProps = isSsr
+        ? switch config.getProps {
+          | Some(getProps) => Some(await getProps())
+          | None => None
+          }
+        : pageProps
 
       let component = getComponentWithBaseLayout(
         React.createElement(make, {"pageProps": pageProps}),
@@ -57,11 +59,12 @@ let render = async (source: string) => {
 
       Some(component, ssrConfig)
     }
-  | Some({default, config}) => Some((
+  | Some({default, config}) =>
+    Some((
       getComponentWithBaseLayout(React.createElement(default, ()), config),
       {
         statusCode: 200,
-        pageProps: Js.Json.null,
+        pageProps: None,
       },
     ))
   | Some({default}) =>
@@ -69,7 +72,7 @@ let render = async (source: string) => {
       getComponentWithBaseLayout(React.createElement(default, ()), {useBaseLayout: true}),
       {
         statusCode: 200,
-        pageProps: Js.Json.null,
+        pageProps: None,
       },
     ))
   | Some(other) => {

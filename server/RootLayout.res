@@ -1,5 +1,20 @@
 @genType @react.component
-let make = (~children, ~pageInfo) => {
+let make = (~children, ~pageInfo, ~pageProps) => {
+  let pagePropsScript = switch pageProps {
+  | Some(pageProps) =>
+    <script
+      type_="application/json"
+      id="pageProps"
+      dangerouslySetInnerHTML={{
+        "__html": switch Js.Json.stringifyAny(pageProps) {
+        | Some(s) => s
+        | None => "{}"
+        },
+      }}
+    />
+  | None => React.null
+  }
+
   <html>
     <head>
       <meta charSet="utf8" />
@@ -22,6 +37,7 @@ let make = (~children, ~pageInfo) => {
           },
         }}
       />
+      pagePropsScript
     </body>
   </html>
 }

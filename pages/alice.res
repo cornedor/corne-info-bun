@@ -1,9 +1,15 @@
 // @react.component
 let make: Page.makeFn = props => {
   let pageProps = props["pageProps"]
+  Js.log2("pageProps", pageProps)
   <div className="p-4">
     <div>
-      <code> {Js.Json.stringify(pageProps)->React.string} </code>
+      <code>
+        {switch pageProps {
+        | Some(pageProps) => Js.Json.stringify(pageProps)->React.string
+        | None => React.string("?")
+        }}
+      </code>
       <pre className="mx-auto p-2 bg-slate-200 rounded w-[700px]">
         {React.string(`Alice's Adventures in Wonderland
 

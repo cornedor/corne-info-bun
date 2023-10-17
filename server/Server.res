@@ -56,10 +56,12 @@ let getPageInfo = (match: Bun.matchedRoute): Page.pageInfo => {
 }
 
 let handleMatch = async (_request, match: Bun.matchedRoute) => {
-  switch await Page.render(match.filePath) {
+  switch await Page.render(match.filePath, true, None) {
   | Some(pageElement, ssrConfig) => {
       let rendered = Preact.RenderToString.render(
-        <RootLayout pageInfo={getPageInfo(match)}> pageElement </RootLayout>,
+        <RootLayout pageInfo={getPageInfo(match)} pageProps={ssrConfig.pageProps}>
+          pageElement
+        </RootLayout>,
       )
       Bun.Response.make(
         "<!doctype html>" ++ rendered,

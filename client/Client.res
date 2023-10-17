@@ -2,6 +2,8 @@ open Webapi
 open Webapi.Dom
 
 let pageInfoElem = Document.getElementById(Webapi.Dom.document, "pageInfo")
+let pagePropsElem = Document.getElementById(Webapi.Dom.document, "pageProps")
+
 let root = switch Document.getElementById(Webapi.Dom.document, "app") {
 | Some(elem) => elem
 | None => raise(Not_found)
@@ -27,11 +29,18 @@ let pageInfo = switch pageInfoElem {
 | None => raise(Not_found)
 }
 
+let pageProps = switch pagePropsElem {
+| Some(elem) => Element.textContent(elem)->Js.Json.parseExn
+| None => Js.Json.null
+}
+
+Js.log(pageProps)
+
 let currentComponent = Preact.Signals.make(React.null)
 
 switch pageInfo {
 | Ok(pageInfo) =>
-  switch await Page.render(pageInfo["src"]) {
+  switch await Page.render(pageInfo["src"], false, Some(pageProps)) {
   | Some((pageElement, _)) => Preact.hydrate(pageElement, root)
   | None => raise(Not_found)
   }

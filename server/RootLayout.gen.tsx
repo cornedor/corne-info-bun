@@ -9,6 +9,10 @@ const RootLayoutBS: any = RootLayoutBS__Es6Import;
 import type {Jsx_element as PervasivesU_Jsx_element} from './PervasivesU.gen';
 
 // tslint:disable-next-line:interface-over-type-literal
-export type props<children,pageInfo> = { readonly children: children; readonly pageInfo: pageInfo };
+export type props<children,pageInfo,pageProps> = {
+  readonly children: children; 
+  readonly pageInfo: pageInfo; 
+  readonly pageProps: pageProps
+};
 
-export const make: <T1>(_1:props<JSX.Element,T1>) => PervasivesU_Jsx_element = RootLayoutBS.make;
+export const make: <T1,T2>(_1:props<JSX.Element,T1,(undefined | T2)>) => PervasivesU_Jsx_element = RootLayoutBS.make;
