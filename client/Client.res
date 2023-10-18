@@ -50,9 +50,34 @@ switch pageInfo {
 let socket = WebSocket.make("ws://localhost:3000/")
 
 socket->WebSocket.addOpenListener(_ => {
+  open Protocol
   Js.log("Socket  open")
-  switch Js.Json.stringifyAny(Some({"e": "ping"})) {
-  | Some(str) => WebSocket.sendText(socket, str)
-  | None => ()
+
+  switch serializeRequest(Ping) {
+  | Ok(data) => WebSocket.sendText(socket, data)
+  | _ => ()
+  }
+})
+
+external toStr: Js.Json.t => string = "%identity"
+socket->WebSocket.addMessageListener(event => {
+  open Protocol
+
+  switch parseResponse(toStr(event.data)) {
+  | Ok(Pong) => Js.log("Pong! Connection works")
+  | Ok(n) => Js.log2("Not implemented", n)
+  | Error(err) => Js.log2("Error", err)
+  }
+})
+
+// TODO: How to do events
+external toCustomEvent: Dom.Event.t => Link.EventWithDetail.t = "%identity"
+Dom.Window.addEventListener(Dom.window, "_s_l", evt => {
+  open Protocol
+  let customEvent = toCustomEvent(evt)->Link.EventWithDetail.detail
+
+  switch serializeRequest(Prefetch({url: customEvent.href})) {
+  | Ok(payload) => WebSocket.sendText(socket, payload)
+  | _ => Js.log("Err")
   }
 })

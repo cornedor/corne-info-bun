@@ -30,6 +30,7 @@
     "react-dom": "npm:@preact/compat",
     "rescript": "next",
     "rescript-nodejs": "^15.0.0",
+    "rescript-struct": "^5.1.0",
     "rescript-webapi": "^0.9.0",
     "tailwindcss": "^3.3.3"
   }

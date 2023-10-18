@@ -102,12 +102,26 @@ let server = Bun.serve({
     }
   },
   websocket: {
-    \"open": async s => {
+    \"open": async _s => {
       Js.log("Socket opened")
-      let _t: int = Bun.ServerWebSocket.close(~t=s, ~code=1, ~reason="")
+      //  let _t: int = Bun.ServerWebSocket.close(~t=s, ~code=1, ~reason="")
+    },
+    close: async (_s, _status, msg) => {
+      Js.log2("Socket closed:", msg)
     },
     message: async (ws, message) => {
-      Js.log(message)
+      open Protocol
+
+      switch parseRequest(message) {
+      | Ok(Ping) => switch serializeResponse(Pong) {
+        | Ok(data) =>
+          let _ = Bun.ServerWebSocket.sendStr(ws, data)
+        | _ => Js.log("Could not send response")
+        }
+      | Ok(Prefetch({url})) => Js.log2("Prefetch", url)
+      | Ok(Refetch({url})) => Js.log2("Prefetch", url)
+      | Error(err) => Js.log(err)
+      }
     },
   },
 })

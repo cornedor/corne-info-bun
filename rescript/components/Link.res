@@ -1,5 +1,11 @@
 open Webapi
 
+module Detail = {
+  type t = {href: string}
+}
+module EventWithDetail = Webapi.Dom.CustomEvent.Make(Detail)
+
+@send external urlToString: Webapi.Url.t => string = "toString"
 @react.component
 let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=?) => {
   switch Js.String2.startsWith(href, "/") {
@@ -20,14 +26,7 @@ let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=
 
         let _ = Dom.EventTarget.dispatchEvent(
           Dom.Window.asEventTarget(window),
-          Dom.CustomEvent.makeWithOptions(
-            "_s_l",
-            {
-              "detail": {
-                "href": url,
-              },
-            },
-          ),
+          EventWithDetail.makeWithOptions("_s_l", {detail: {href: urlToString(url)}}),
         )
       }}
       onClick={e => {
@@ -41,15 +40,9 @@ let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=
 
         let _ = Dom.EventTarget.dispatchEvent(
           Dom.Window.asEventTarget(window),
-          Dom.CustomEvent.makeWithOptions(
-            "_s_l",
-            {
-              "detail": {
-                "href": url,
-              },
-            },
-          ),
+          EventWithDetail.makeWithOptions("_s_p", {detail: {href: urlToString(url)}}),
         )
+        ReactEvent.Mouse.preventDefault(e)
       }}>
       children
     </a>

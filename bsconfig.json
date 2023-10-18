@@ -36,10 +36,12 @@
     "@ryyppy/rescript-promise",
     "rescript-webapi",
     "@rescript/core",
-    "rescript-nodejs"
+    "rescript-nodejs",
+    "rescript-struct"
   ],
   "bsc-flags": [
-    "-open RescriptCore"
+    "-open RescriptCore",
+    "-open RescriptStruct"
   ],
   "jsx": {
     "version": 4,

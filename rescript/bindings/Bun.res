@@ -199,13 +199,14 @@ module ServerWebSocket = {
 
   type compress = bool
 
-  @send external sendStr: (string, compress) => int = "send"
-  @send external sendText: (string, compress) => int = "sendText"
+  @send external sendStr: (t, string) => int = "send"
+  @send external sendText: (t, string) => int = "sendText"
   @send external close: (~t: t, ~code: int=?, ~reason: string=?) => int = "close"
 }
 
 type buffer = unknown // todo
-type message = StringMessage(string) | BufferMessage(buffer)
+// type message = StringMessage(string) | BufferMessage(buffer)
+type message = string
 
 type webSocketHandler = {
   message?: (ServerWebSocket.t, message) => promise<unit>,
@@ -366,7 +367,7 @@ type buildArtifact = {
 
 type buildOutput = {
   outputs: array<unit>,
- success: bool,
+  success: bool,
   logs: array<unit>,
 }
 
