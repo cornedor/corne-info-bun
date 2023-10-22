@@ -173,4 +173,4 @@ let server = Bun.serve({
   },
 })
 
-let _ = Bun.Server.fetchStr(server, "/")
+Js.log("Starting server...")
