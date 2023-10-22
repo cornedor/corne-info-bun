@@ -1,3 +1,3 @@
 open Webapi
 
-let socket = Webapi.WebSocket.make("/")
+let socket = WebSocket.make("/")

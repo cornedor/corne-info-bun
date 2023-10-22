@@ -12,6 +12,9 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
+  "scripts": {
+    "tailwindcss": "tailwindcss"
+  },
   "dependencies": {
     "@fontsource-variable/vollkorn": "^5.0.13",
     "@glennsl/rescript-fetch": "^0.2.0",
