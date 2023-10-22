@@ -3,6 +3,7 @@ open Webapi
 Bun.plugin(MDXPlugin.mdxPlugin)
 
 let importMetaDir = %raw("import.meta.dir")
+let origin = %raw("process.env.ROUTER_ORIGIN")
 
 %%raw(`globalThis.CLIENTSIDE = false`)
 
@@ -26,7 +27,7 @@ let importMetaDir = %raw("import.meta.dir")
 let router = Bun.FileSystemRouter.make({
   style: #nextjs,
   dir: "./pages",
-  origin: "http://localhost:3000",
+  origin,
   assetPrefix: "pages/",
   fileExtensions: [".js", ".tsx", ".mdx"],
 })
