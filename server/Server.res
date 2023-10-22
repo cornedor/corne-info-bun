@@ -4,19 +4,24 @@ Bun.plugin(MDXPlugin.mdxPlugin)
 
 let importMetaDir = %raw("import.meta.dir")
 
-let startBuilder = async () => {
-  let pages = await Glob.glob("{pages,client}/**/*.{ts,tsx,mdx,js}")
-  Js.log("Building " ++ Belt.Int.toString(Array.length(pages)) ++ " files...")
-  await Bun.build({
-    entrypoints: pages,
-    outdir: "./_s",
-    splitting: true,
-    plugins: [MDXPlugin.mdxPlugin],
-    // minify: process.env.DEV_MODE !== "true",
-  })
-}
+%%raw(`globalThis.CLIENTSIDE = false`)
 
-Promise.done(startBuilder())
+// let startBuilder = async () => {
+//   let pages = await Glob.glob("{pages,client}/**/*.{ts,tsx,mdx,js}")
+//   Js.log("Building " ++ Belt.Int.toString(Array.length(pages)) ++ " files...")
+//   await Bun.build({
+//     entrypoints: pages,
+//     outdir: "./_s",
+//     splitting: true,
+//     minify: MinifyEnabled(true),
+//     plugins: [MDXPlugin.mdxPlugin],
+//     // minify: process.env.DEV_MODE !== "true",
+//     root: ".",
+//     publicPath: "./",
+//   })
+// }
+
+// Promise.done(startBuilder())
 
 let router = Bun.FileSystemRouter.make({
   style: #nextjs,
@@ -29,7 +34,7 @@ let router = Bun.FileSystemRouter.make({
 let htmlHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{("Content-Type", "text/html")})
 let staticHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{("Cache-Control", "max-age=3600")})
 let publicHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{
-  ("Cache-Control", "public, max-age=604800, immutable"),
+  ("Cache-Control", "public, max-age=31536000, stale-while-revalidate=86400, immutable"),
 })
 
 let handleNotFound = () => {
@@ -80,6 +85,11 @@ let handleFile = async (request: Bun.request) => {
   let staticFile = Bun.file(~path=staticPath)
   let publicFile = Bun.file(~path=publicPath)
 
+  let staticHeaders = switch String.startsWith(pathname, "chunk") {
+  | true => publicHeaders
+  | false => staticHeaders
+  }
+
   switch await Js.Promise2.all2((Bun.BunFile.exists(staticFile), Bun.BunFile.exists(publicFile))) {
   | (false, false) => handleNotFound()
   | (true, _) => Bun.Response.make(staticFile, {status: 200, headers: staticHeaders})
@@ -113,13 +123,50 @@ let server = Bun.serve({
       open Protocol
 
       switch parseRequest(message) {
-      | Ok(Ping) => switch serializeResponse(Pong) {
+      | Ok(Ping) =>
+        switch serializeResponse(Pong) {
         | Ok(data) =>
           let _ = Bun.ServerWebSocket.sendStr(ws, data)
         | _ => Js.log("Could not send response")
         }
-      | Ok(Prefetch({url})) => Js.log2("Prefetch", url)
-      | Ok(Refetch({url})) => Js.log2("Prefetch", url)
+      | Ok(Prefetch({url})) =>
+        switch Js.Nullable.toOption(Bun.FileSystemRouter.match(router, url)) {
+        | Some(m) => {
+            let pageInfo = getPageInfo(m)
+            switch serializeResponse(PrefetchSource({src: pageInfo.src})) {
+            | Ok(data) =>
+              let _ = Bun.ServerWebSocket.sendStr(ws, data)
+            | _ => Js.log("Could not send response")
+            }
+          }
+        | None => Js.log("Page not found, so cannot be prefetched")
+        }
+      | Ok(Refetch({url})) =>
+        switch Js.Nullable.toOption(Bun.FileSystemRouter.match(router, url)) {
+        | Some(m) =>
+          switch await Page.render(m.filePath, true, None) {
+          | Some(_, ssrConfig) => {
+              let pageInfo = getPageInfo(m)
+              switch serializeResponse(
+                Match({
+                  src: pageInfo.src,
+                  pageProps: ssrConfig.pageProps,
+                }),
+              ) {
+              | Ok(data) =>
+                let _ = Bun.ServerWebSocket.sendStr(ws, data)
+              | _ => Js.log("Could not send response")
+              }
+            }
+          | None => Js.log("...")
+          }
+        | None =>
+          switch serializeResponse(NoMatch) {
+          | Ok(data) =>
+            let _ = Bun.ServerWebSocket.sendStr(ws, data)
+          | _ => Js.log("Could not send response")
+          }
+        }
       | Error(err) => Js.log(err)
       }
     },

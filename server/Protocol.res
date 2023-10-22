@@ -5,9 +5,9 @@ type request =
 
 type response =
   | Pong
-  | Prefetched({data: Js.Json.t})
+  | PrefetchSource({src: string})
   | NoMatch
-  | Match({data: Js.Json.t})
+  | Match({src: string, pageProps: option<Js.Json.t>})
 
 let requestStruct = S.union([
   S.object(s => {
@@ -35,8 +35,8 @@ let responseStruct = S.union([
   }),
   S.object(s => {
     s.tag("<", "r")
-    Prefetched({
-      data: s.field("data", S.json),
+    PrefetchSource({
+      src: s.field("s", S.string),
     })
   }),
   S.object(s => {
@@ -46,7 +46,8 @@ let responseStruct = S.union([
   S.object(s => {
     s.tag("<", "m")
     Match({
-      data: s.field("data", S.json),
+      src: s.field("s", S.string),
+      pageProps: s.field("p", S.option(S.json)),
     })
   }),
 ])

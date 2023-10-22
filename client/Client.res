@@ -60,11 +60,36 @@ socket->WebSocket.addOpenListener(_ => {
 })
 
 external toStr: Js.Json.t => string = "%identity"
+let refetchCurrentPage = () => {
+  open Protocol
+  let href = Dom.Location.href(Dom.location)
+  switch serializeRequest(Refetch({url: href})) {
+  | Ok(payload) => WebSocket.sendText(socket, payload)
+  | _ => Js.log("Err")
+  }
+}
+Dom.Window.addPopStateEventListener(Dom.window, _ => {
+  refetchCurrentPage()
+})
+
 socket->WebSocket.addMessageListener(event => {
   open Protocol
 
   switch parseResponse(toStr(event.data)) {
   | Ok(Pong) => Js.log("Pong! Connection works")
+  | Ok(PrefetchSource({src})) => {
+      let _ = Page.importPage(src)
+    }
+  | Ok(Match({src, pageProps})) =>
+    let _ = Page.render(src, false, pageProps)->Promise.then(r =>
+      Promise.resolve(
+        switch r {
+        | Some((pageElement, _)) =>
+          let _ = Preact.hydrate(pageElement, root)
+        | None => raise(Not_found)
+        },
+      )
+    )
   | Ok(n) => Js.log2("Not implemented", n)
   | Error(err) => Js.log2("Error", err)
   }
@@ -72,11 +97,21 @@ socket->WebSocket.addMessageListener(event => {
 
 // TODO: How to do events
 external toCustomEvent: Dom.Event.t => Link.EventWithDetail.t = "%identity"
-Dom.Window.addEventListener(Dom.window, "_s_l", evt => {
+Dom.Window.addEventListener(Dom.window, "_s_p", evt => {
   open Protocol
   let customEvent = toCustomEvent(evt)->Link.EventWithDetail.detail
 
   switch serializeRequest(Prefetch({url: customEvent.href})) {
+  | Ok(payload) => WebSocket.sendText(socket, payload)
+  | _ => Js.log("Err")
+  }
+})
+
+Dom.Window.addEventListener(Dom.window, "_s_l", evt => {
+  open Protocol
+  let customEvent = toCustomEvent(evt)->Link.EventWithDetail.detail
+
+  switch serializeRequest(Refetch({url: customEvent.href})) {
   | Ok(payload) => WebSocket.sendText(socket, payload)
   | _ => Js.log("Err")
   }

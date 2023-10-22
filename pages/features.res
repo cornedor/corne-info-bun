@@ -18,9 +18,15 @@ let make: Page.makeFn = props => {
   </>
 }
 
-let config: Page.pageConfig = {
-  title: "Features",
-  getProps: async () => {
-    Js.Json.string("Server says: " ++ Float.toString(Math.random()))
-  },
-}
+let title = "Features"
+// TODO: Find a shorter way to do this
+let config: Page.pageConfig = %raw(`CLIENTSIDE`)
+  ? {
+      title: title,
+    }
+  : {
+      title,
+      getProps: async () => {
+        Js.Json.string("Server says: " ++ Float.toString(Math.random()))
+      },
+    }

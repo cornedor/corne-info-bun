@@ -5,6 +5,7 @@ module Detail = {
 }
 module EventWithDetail = Webapi.Dom.CustomEvent.Make(Detail)
 
+external toState: 'a => Dom.History.state = "%identity"
 @send external urlToString: Webapi.Url.t => string = "toString"
 @react.component
 let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=?) => {
@@ -26,7 +27,7 @@ let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=
 
         let _ = Dom.EventTarget.dispatchEvent(
           Dom.Window.asEventTarget(window),
-          EventWithDetail.makeWithOptions("_s_l", {detail: {href: urlToString(url)}}),
+          EventWithDetail.makeWithOptions("_s_p", {detail: {href: urlToString(url)}}),
         )
       }}
       onClick={e => {
@@ -38,9 +39,11 @@ let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=
         let base = Dom.Location.href(Dom.location)
         let url = Url.makeWith(href, ~base)
 
+        Dom.History.pushState(Dom.history, toState(Js.Dict.empty()), "", urlToString(url))
+
         let _ = Dom.EventTarget.dispatchEvent(
           Dom.Window.asEventTarget(window),
-          EventWithDetail.makeWithOptions("_s_p", {detail: {href: urlToString(url)}}),
+          EventWithDetail.makeWithOptions("_s_l", {detail: {href: urlToString(url)}}),
         )
         ReactEvent.Mouse.preventDefault(e)
       }}>
