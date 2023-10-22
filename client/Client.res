@@ -47,7 +47,7 @@ switch pageInfo {
 | _ => raise(Not_found)
 }
 
-let socket = WebSocket.make("ws://" ++ Dom.Location.host(Dom.location) ++ ":3000/")
+let socket = WebSocket.make("wss://" ++ Dom.Location.host(Dom.location) ++ ":3000/")
 
 socket->WebSocket.addOpenListener(_ => {
   open Protocol
