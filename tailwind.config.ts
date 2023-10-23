@@ -4,7 +4,10 @@ import type { PluginAPI } from "tailwindcss/types/config";
 
 export default {
   content: [
-    "./{client,components,layouts,pages,server,styles}/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue,rescript}",
+    // "./{_s,client,components,layouts,pages,rescript}/*.{js,mdx,res}",
+    // "./{_s,client,components,layouts,pages,rescript}/**/*.{js,mdx,res}",
+    "./_s/**/*.js",
+    "./styles/base.css",
   ],
   theme: {
     fontFamily: {

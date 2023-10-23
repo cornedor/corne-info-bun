@@ -69,6 +69,7 @@ let handleMatch = async (_request, match: Bun.matchedRoute) => {
           pageElement
         </RootLayout>,
       )
+      // Js.log(rendered)
       Bun.Response.make(
         "<!doctype html>" ++ rendered,
         {status: ssrConfig.statusCode, headers: htmlHeaders},

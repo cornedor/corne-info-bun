@@ -15,6 +15,7 @@ let make = (~children, ~title) => {
   <div
     className="flex min-h-screen max-w-screen-md flex-col gap-1 bg-stone-100 contrast-more:bg-white dark:bg-stone-900 md:border-r md:border-dashed md:border-stone-300 lg:ml-10 lg:border-l">
     <Header />
+    <CommonIcon />
     titleElem
     <article className="max-w-screen-md p-4 pl-6 pt-20"> children </article>
     <footer className="flex items-center gap-2 p-4 pl-6 text-sm">

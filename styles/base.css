@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.fedi {
+  --avatar-size: 64px;
+  --content-offset: calc(0px - var(--avatar-size) - 20px);
+}
+
+.fedi_avatar {
+  border-radius: 3px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+}
+
+.fedi_content {
+  margin-left: var(--content-offset);
+}
+
+.fedi_status-info {
+  min-height: calc(var(--avatar-size) + 20px);
+}
+
+@media screen(sm) {
+  .fedi {
+    --avatar-size: 100px;
+  }
+
+  .fedi_content {
+    margin-left: 0px;
+  }
+
+  .fedi_status-info {
+    min-height: auto;
+  }
+}

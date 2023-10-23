@@ -19,3 +19,5 @@ await esbuild.build({
     CLIENTSIDE: 'true'
   }
 })
+
+console.log("Build done!", new Date())

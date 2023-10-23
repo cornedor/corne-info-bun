@@ -49,13 +49,13 @@
   height: 500px;
   margin: 40px auto;
   max-width: 900px;
-  border: solid theme('colors.slate.400') 2px;
+  border: solid theme("colors.slate.400") 2px;
   border-radius: 4px;
   padding: 10px;
 }
 
 .marketdata-bar {
-  background: theme('colors.purple.600');
+  background: theme("colors.purple.600");
   @apply rounded;
   width: 30px;
   position: absolute;
@@ -84,7 +84,7 @@
   @apply rounded;
   height: 400px;
   width: 30px;
-  background: theme('colors.slate.200');
+  background: theme("colors.slate.200");
   position: relative;
   flex-shrink: 0;
 }
