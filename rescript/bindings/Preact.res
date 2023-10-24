@@ -1,5 +1,7 @@
 @module("preact")
 external hydrate: (JsxU.element, Webapi.Dom.Element.t) => unit = "hydrate"
+@module("preact")
+external render: (JsxU.element, Webapi.Dom.Element.t) => unit = "render"
 
 module RenderToString = {
   @module("preact-render-to-string")

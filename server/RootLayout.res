@@ -32,9 +32,9 @@ let make = (~children, ~pageInfo, ~pageProps) => {
         type_="application/json"
         id="pageInfo"
         dangerouslySetInnerHTML={{
-          "__html": switch Js.Json.stringifyAny(pageInfo) {
-          | Some(s) => s
-          | None => "{}"
+          "__html": switch S.serializeToJsonStringWith(pageInfo, Protocol.pageInfoStruct) {
+          | Ok(s) => s
+          | _ => "{}"
           },
         }}
       />

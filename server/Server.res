@@ -5,24 +5,8 @@ Bun.plugin(MDXPlugin.mdxPlugin)
 let importMetaDir = %raw("import.meta.dir")
 let origin = %raw("process.env.ROUTER_ORIGIN")
 
+// This is used to tree shake SSR functions from frontend code.
 %%raw(`globalThis.CLIENTSIDE = false`)
-
-// let startBuilder = async () => {
-//   let pages = await Glob.glob("{pages,client}/**/*.{ts,tsx,mdx,js}")
-//   Js.log("Building " ++ Belt.Int.toString(Array.length(pages)) ++ " files...")
-//   await Bun.build({
-//     entrypoints: pages,
-//     outdir: "./_s",
-//     splitting: true,
-//     minify: MinifyEnabled(true),
-//     plugins: [MDXPlugin.mdxPlugin],
-//     // minify: process.env.DEV_MODE !== "true",
-//     root: ".",
-//     publicPath: "./",
-//   })
-// }
-
-// Promise.done(startBuilder())
 
 let router = Bun.FileSystemRouter.make({
   style: #nextjs,
@@ -35,19 +19,20 @@ let router = Bun.FileSystemRouter.make({
 let htmlHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{("Content-Type", "text/html")})
 let staticHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{("Cache-Control", "max-age=3600")})
 let publicHeaders: Js.Dict.t<string> = Js.Dict.fromList(list{
-  ("Cache-Control", "public, max-age=31536000, stale-while-revalidate=86400, immutable"),
+  ("Cache-Control", "public, max-age=31536000, immutable"),
 })
 
 let handleNotFound = () => {
   Bun.Response.make(
-    "404 page not found",
+    "404 page not found - <a href='/'>Go to home</a>",
     {
       status: 404,
+      headers: htmlHeaders,
     },
   )
 }
 
-let getPageInfo = (match: Bun.matchedRoute): Page.pageInfo => {
+let getPageInfo = (match: Bun.matchedRoute): Protocol.pageInfo => {
   let frontendUrl = Url.make(match.src)
   let frontendPath = Path.parse(Url.pathname(frontendUrl))
 

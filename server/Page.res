@@ -16,13 +16,6 @@ type pageModule = {
   default?: unit => React.element,
 }
 
-type pageInfo = {
-  kind: Bun.matchedRouteKind,
-  params: Js.Dict.t<string>,
-  query: Js.Dict.t<string>,
-  src: string,
-}
-
 type ssrConfig = {statusCode: int, pageProps: option<Js.Json.t>}
 
 external importPage: string => promise<option<pageModule>> = "import"

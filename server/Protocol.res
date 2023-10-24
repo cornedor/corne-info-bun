@@ -9,6 +9,13 @@ type response =
   | NoMatch
   | Match({src: string, pageProps: option<Js.Json.t>})
 
+type pageInfo = {
+  kind: Bun.matchedRouteKind,
+  params: Js.Dict.t<string>,
+  query: Js.Dict.t<string>,
+  src: string,
+}
+
 let requestStruct = S.union([
   S.object(s => {
     s.tag(">", "p")
@@ -51,6 +58,21 @@ let responseStruct = S.union([
     })
   }),
 ])
+
+let pageInfoStruct = S.object(s => {
+  kind: s.field(
+    "k",
+    S.union([
+      S.literal(#exact),
+      S.literal(#"catch-all"),
+      S.literal(#"optional-catch-all"),
+      S.literal(#dynamic),
+    ]),
+  ),
+  params: s.field("p", S.dict(S.string)),
+  query: s.field("q", S.dict(S.string)),
+  src: s.field("s", S.string),
+})
 
 let parseRequest = message => {
   S.parseJsonStringWith(message, requestStruct)

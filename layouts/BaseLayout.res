@@ -17,7 +17,14 @@ let make = (~children, ~title) => {
     <Header />
     <CommonIcon />
     titleElem
-    <article className="max-w-screen-md p-4 pl-6 pt-20"> children </article>
+    <article
+      className="max-w-screen-md p-4 pl-6 pt-20"
+      key={switch title {
+      | Some(title) => title
+      | _ => ""
+      }}>
+      children
+    </article>
     <footer className="flex items-center gap-2 p-4 pl-6 text-sm">
       {React.string("Follow me: ")}
       <SlimLink href="https://cd0.nl/@corne" rel="me"> {React.string("@corne@cd0.nl")} </SlimLink>
