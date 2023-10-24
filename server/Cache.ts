@@ -1,41 +1,49 @@
-import { Database } from "bun:sqlite";
+globalThis.CLIENTSIDE = globalThis.CLIENTSIDE ?? false;
 
-const db = new Database(":memory:");
+const db = CLIENTSIDE
+  ? null
+  : new (await import("bun:sqlite")).Database(":memory:");
 
-const createDbQuery = db.query(
-  `CREATE TABLE cache (path TEXT PRIMARY KEY, data TEXT, age INTEGER);`
-);
-createDbQuery.run();
-
-export function getCachedPageProps(path: string, age: number) {
-  console.log(age);
-  const query = db.query<{ data: string; age: number }, { $path: string }>(
-    `SELECT data, age FROM cache WHERE path = $path`
-  );
-  const result = query.all({
-    $path: path,
-  });
-
-  return result?.[0]
-    ? {
-        data: result[0].data,
-        age: result[0].age,
-      }
-    : undefined;
+if (!CLIENTSIDE) {
+  db!
+    .query(
+      `CREATE TABLE cache (path TEXT PRIMARY KEY, data TEXT, age INTEGER);`
+    )
+    .run();
 }
 
-export function setCachedPageProps(path: string, data: string, age: number) {
-  console.log("Set");
-  const query = db.query<
-    undefined,
-    { $path: string; $data: string; $age: number }
-  >(
-    `INSERT OR REPLACE INTO cache (path, data, age) VALUES ($path, $data, $age)`
-  );
+export const getCachedPageProps = CLIENTSIDE
+  ? undefined
+  : (path: string) => {
+      const query = db!.query<{ data: string; age: number }, { $path: string }>(
+        `SELECT data, age FROM cache WHERE path = $path`
+      );
+      const result = query.all({
+        $path: path,
+      });
 
-  query.run({
-    $path: path,
-    $data: data,
-    $age: age,
-  });
-}
+      return result?.[0]
+        ? {
+            data: result[0].data,
+            age: result[0].age,
+          }
+        : undefined;
+    };
+
+export const setCachedPageProps = CLIENTSIDE
+  ? undefined
+  : (path: string, data: string, age: number) => {
+      console.log("Set");
+      const query = db!.query<
+        undefined,
+        { $path: string; $data: string; $age: number }
+      >(
+        `INSERT OR REPLACE INTO cache (path, data, age) VALUES ($path, $data, $age)`
+      );
+
+      query.run({
+        $path: path,
+        $data: data,
+        $age: age,
+      });
+    };

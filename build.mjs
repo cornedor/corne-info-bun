@@ -10,6 +10,7 @@ await esbuild.build({
   treeShaking: true,
   minify: true,
   format: 'esm',
+  sourcemap: "linked",
   outdir: '_s',
   external: ["bun:sqlite"],
   plugins: [mdx({
