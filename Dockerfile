@@ -7,8 +7,8 @@ RUN bun install
 
 COPY . .
 RUN bun run rescript build
-RUN bunx tailwindcss -o public/output.css --minify
 RUN bun run build.mjs
+RUN bunx tailwindcss -o public/output.css --minify
 
 ENV PORT 3000
 

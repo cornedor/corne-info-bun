@@ -62,7 +62,7 @@ let make: Page.makeFn = props => {
           | #image =>
             <Link href={getMediaLink(item)} key={item.id}>
               <img
-                className="fedi_statusMediaImg"
+                className="rounded border-2 border-stone-300 object-cover aspect-[9/6]"
                 src={item.preview_url}
                 width="200"
                 height="200"
@@ -187,4 +187,5 @@ let config: Page.pageConfig = %raw(`CLIENTSIDE`)
 
         data
       },
+      revalidate: 900_000, // 15 min
     }

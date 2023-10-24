@@ -11,6 +11,7 @@ await esbuild.build({
   minify: true,
   format: 'esm',
   outdir: '_s',
+  external: ["bun:sqlite"],
   plugins: [mdx({
     jsxImportSource: 'preact',
     jsxRuntime: 'automatic'

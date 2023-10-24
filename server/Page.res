@@ -7,6 +7,7 @@ type pageConfig = {
   useBaseLayout?: bool,
   statusCode?: int,
   getProps?: getPropsFn,
+  revalidate?: int,
 }
 
 type pageModule = {
@@ -25,6 +26,12 @@ type pageInfo = {
 type ssrConfig = {statusCode: int, pageProps: option<Js.Json.t>}
 
 external importPage: string => promise<option<pageModule>> = "import"
+type cachedResult = {data: string, age: int}
+@module("./Cache.ts")
+external getCachedPageProps: (~path: string) => option<cachedResult> = "getCachedPageProps"
+@module("./Cache.ts")
+external setCachedPageProps: (~path: string, ~data: string, ~age: int) => unit =
+  "setCachedPageProps"
 
 let getComponentWithBaseLayout = (children, config) => {
   switch config.useBaseLayout {
@@ -37,12 +44,40 @@ let render = async (source: string, isSsr: bool, pageProps: option<Js.Json.t>) =
   switch await importPage(source) {
   | None => None
   | Some({make, config}) => {
-      let pageProps = isSsr
-        ? switch config.getProps {
-          | Some(getProps) => Some(await getProps())
-          | None => None
+      let pageProps = switch (isSsr, config.revalidate) {
+      | (true, Some(revalidate)) => {
+          let now = Belt.Float.toInt(Date.now())
+          let revalidateAge = now - revalidate
+          let cached = getCachedPageProps(~path=source)
+
+          switch cached {
+          | Some({data, age}) if age > revalidateAge => Some(JSON.parseExn(data))
+          | _ =>
+            switch config.getProps {
+            | Some(getProps) => {
+                let result = await getProps()
+                let json = JSON.stringifyAny(result)
+                switch json {
+                | Some(json) =>
+                  setCachedPageProps(~path=source, ~data=json, ~age=Belt.Float.toInt(Date.now()))
+                | None => ()
+                }
+                Some(result)
+              }
+            | None => None
+            }
           }
-        : pageProps
+        }
+      | (true, _) =>
+        switch config.getProps {
+        | Some(getProps) => {
+            let result = await getProps()
+            Some(result)
+          }
+        | None => None
+        }
+      | (false, _) => pageProps
+      }
 
       let component = getComponentWithBaseLayout(
         React.createElement(make, {"pageProps": pageProps}),
