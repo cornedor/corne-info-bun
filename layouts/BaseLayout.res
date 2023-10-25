@@ -4,13 +4,13 @@ let make = (~children, ~title, ~showMainTitle) => {
   | None => <> </>
   | Some(title) =>
     <h2
-      className="transition-transform ease-in-out duration-200 font-wght-680 ml-auto inline w-max max-w-full  pl-0 font-heading text-lg dark:text-black contrast-more:dark:text-white sm:text-3xl md:text-5xl sm:mt-1 md:mt-2"
+      className="transition-transform ease-in-out duration-200 font-wght-680 ml-auto inline w-max max-w-full pl-0 font-heading text-lg dark:text-black contrast-more:dark:text-white sm:text-3xl md:text-5xl sm:mt-1 md:mt-2"
       style={switch showMainTitle {
       | true => ReactDOM.Style.make()
       | false => ReactDOM.Style.make(~transform="translateY(-112px)", ())
       }}>
       <span
-        className="bg-amber-400 box-decoration-clone p-1 pl-6 pt-0 contrast-more:dark:bg-amber-700 sm:leading-[1.3]">
+        className="bg-amber-400 box-decoration-clone p-1 pl-6 pr-6 pt-0 contrast-more:dark:bg-amber-700 sm:leading-[1.3]">
         {React.string(title)}
       </span>
     </h2>

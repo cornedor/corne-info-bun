@@ -30,6 +30,9 @@ export default {
         ".font-wght-680": {
           "font-variation-settings": `'wght' 680;`,
         },
+        ".font-wght-800": {
+          "font-variation-settings": `'wght' 800;`,
+        },
       });
     },
   ],

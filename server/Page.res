@@ -1,7 +1,11 @@
-@react.component
-type makeFn = {"pageProps": option<Js.Json.t>} => React.element
+type makeFn = {
+  "pageProps": option<Js.Json.t>,
+  "components": option<MDXComponents.components>,
+} => React.element
 
 type getPropsFn = unit => promise<Js.Json.t>
+
+@genType
 type pageConfig = {
   title?: string,
   useBaseLayout?: bool,
@@ -13,7 +17,7 @@ type pageConfig = {
 type pageModule = {
   make?: makeFn,
   config?: pageConfig,
-  default?: unit => React.element,
+  default?: makeFn,
 }
 
 type ssrConfig = {statusCode: int, pageProps: option<Js.Json.t>}
@@ -76,7 +80,7 @@ let render = async (source: string, isSsr: bool, pageProps: option<Js.Json.t>) =
       }
 
       let component = getComponentWithBaseLayout(
-        React.createElement(make, {"pageProps": pageProps}),
+        React.createElement(make, {"pageProps": pageProps, "components": None}),
         config,
       )
 
@@ -92,7 +96,16 @@ let render = async (source: string, isSsr: bool, pageProps: option<Js.Json.t>) =
     }
   | Some({default, config}) =>
     Some((
-      getComponentWithBaseLayout(React.createElement(default, ()), config),
+      getComponentWithBaseLayout(
+        React.createElement(
+          default,
+          {
+            "pageProps": None,
+            "components": Some(MDXComponents.components),
+          },
+        ),
+        config,
+      ),
       {
         statusCode: 200,
         pageProps: None,
@@ -100,7 +113,16 @@ let render = async (source: string, isSsr: bool, pageProps: option<Js.Json.t>) =
     ))
   | Some({default}) =>
     Some((
-      getComponentWithBaseLayout(React.createElement(default, ()), {useBaseLayout: true}),
+      getComponentWithBaseLayout(
+        React.createElement(
+          default,
+          {
+            "pageProps": None,
+            "components": None,
+          },
+        ),
+        {useBaseLayout: true},
+      ),
       {
         statusCode: 200,
         pageProps: None,

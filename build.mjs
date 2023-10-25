@@ -13,9 +13,12 @@ await esbuild.build({
   sourcemap: "linked",
   outdir: '_s',
   external: ["bun:sqlite"],
+  loader: {
+    '.js': 'jsx'
+  },
   plugins: [mdx({
     jsxImportSource: 'preact',
-    jsxRuntime: 'automatic'
+    jsxRuntime: 'automatic',
   })],
   define: {
     CLIENTSIDE: 'true'

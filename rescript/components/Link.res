@@ -8,14 +8,15 @@ module EventWithDetail = Webapi.Dom.CustomEvent.Make(Detail)
 external toState: 'a => Dom.History.state = "%identity"
 @send external urlToString: Webapi.Url.t => string = "toString"
 @react.component
-let make = (~href, ~children, ~className="", ~rel="", ~onMouseEnter=?, ~onClick=?) => {
+let make = (~href, ~children, ~className="", ~target="", ~rel="", ~onMouseEnter=?, ~onClick=?) => {
   switch Js.String2.startsWith(href, "/") {
-  | false => <a href className rel> children </a>
+  | false => <a href className rel target> children </a>
   | true =>
     <a
       href
       className
       rel
+      target
       onMouseEnter={e => {
         switch onMouseEnter {
         | Some(onMouseEnter) => onMouseEnter(e)
