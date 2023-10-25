@@ -28,7 +28,10 @@ external setCachedPageProps: (~path: string, ~data: string, ~age: int) => unit =
 
 let getComponentWithBaseLayout = (children, config) => {
   switch config.useBaseLayout {
-  | Some(true) | None => <BaseLayout title={config.title}> children </BaseLayout>
+  | Some(true) | None =>
+    <BaseLayout title={config.title} showMainTitle={config.title == Some("Blog")}>
+      children
+    </BaseLayout>
   | Some(false) => children
   }
 }

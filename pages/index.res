@@ -7,7 +7,7 @@ let make: Page.makeFn = () => {
     },
   )
 
-  <ol className="list-roman pl-5" reversed={true}>
+  <ol className="list-roman pl-5 pt-20" reversed={true}>
     <li>
       <NavLink
         href="/features"
