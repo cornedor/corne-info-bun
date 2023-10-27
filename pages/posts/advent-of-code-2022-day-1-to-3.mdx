@@ -1,0 +1,273 @@
+import { make as Spoiler } from "../../rescript/components/Spoiler";
+import {
+  getMostCalloriesElf,
+  getThreeMostCalloriesElf,
+} from "../../rescript/aoc22/DayOne";
+
+import {
+  calculateStrategyScore,
+  calculateStrategyScore2,
+} from "../../rescript/aoc22/DayTwo";
+import { getAllDoublesInRucksacks } from "../../rescript/aoc22/DayThree";
+import { getElfGroups } from "../../rescript/aoc22/DayThreeB";
+
+## Day 1
+
+This one seems to be rather easy, just adding the calories and find the biggest number. The twist is
+also not too hard, a great puzzle to warm up this year.
+
+<Spoiler summaryContent="Spoiler: sollution">
+<pre>{JSON.stringify(getMostCalloriesElf(), null, 2)}</pre>
+
+<pre>{JSON.stringify(getThreeMostCalloriesElf(), null, 2)}</pre>
+
+```rescript
+let getMostCalloriesElf = () => {
+  let data =
+    DayOneInput.data
+    |> Js.String.split("\n\n")
+    |> Js.Array.map(elf => {
+      elf
+      |> Js.String.split("\n")
+      |> Js.Array.map(item => {
+        let value = Belt.Int.fromString(item)
+        switch value {
+        | Some(v) => v
+        | None => 0
+        }
+      })
+      |> Js.Array.reduce(\"+", 0)
+    })
+    |> Js.Array.sortInPlaceWith((a, b) => b - a)
+
+  data
+}
+
+```
+
+</Spoiler>
+
+## Day 2
+
+Today we get a twist that requires you to puzzle a bit more.
+
+### Part 1
+
+<Spoiler summaryContent="Spoiler: sollution">
+<pre>{JSON.stringify(calculateStrategyScore(), null, 2)}</pre>
+
+<pre>{JSON.stringify(calculateStrategyScore2(), null, 2)}</pre>
+
+```rescript
+type hand = Rock | Paper | Scissor
+let isHandWinning = ((oponent, yours)) => {
+  switch oponent {
+  | Rock => yours === Paper
+  | Paper => yours === Scissor
+  | Scissor => yours === Rock
+  }
+}
+
+let isDraw = ((oponent, yours): (hand, hand)) => oponent === yours
+
+let handScore = hand => {
+  let base = switch hand {
+  | (_, Rock) => 1
+  | (_, Paper) => 2
+  | (_, Scissor) => 3
+  }
+
+  switch (isDraw(hand), isHandWinning(hand)) {
+  | (true, _) => base + 3
+  | (false, true) => base + 6
+  | (false, false) => base + 0
+  }
+}
+
+exception Invalid_Token
+
+let tokenToHand = token => {
+  switch token {
+  | "A" => Rock
+  | "X" => Rock
+  | "B" => Paper
+  | "Y" => Paper
+  | "C" => Scissor
+  | "Z" => Scissor
+  | _ => raise(Invalid_Token)
+  }
+}
+
+let convertWinStatusToHand = hand => {
+  switch hand {
+  | (Rock, Rock) => (Rock, Scissor) // Lose
+  | (Rock, Paper) => (Rock, Rock) // Draw
+  | (Rock, Scissor) => (Rock, Paper) // Win
+  | (Paper, Rock) => (Paper, Rock)
+  | (Paper, Paper) => (Paper, Paper)
+  | (Paper, Scissor) => (Paper, Scissor)
+  | (Scissor, Rock) => (Scissor, Paper)
+  | (Scissor, Paper) => (Scissor, Scissor)
+  | (Scissor, Scissor) => (Scissor, Rock)
+  }
+}
+
+let calculateStrategyScore = () => {
+  DayTwoInput.data
+  |> Js.String.split("\n")
+  |> Js.Array.map(round => {
+    let tokens = round |> Js.String.split(" ")
+    let hand = (tokenToHand(tokens[0]), tokenToHand(tokens[1]))
+
+    let score = handScore(hand)
+
+    score
+  })
+  |> Js.Array.reduce(\"+", 0)
+}
+
+let calculateStrategyScore2 = () => {
+  DayTwoInput.data
+  |> Js.String.split("\n")
+  |> Js.Array.map(round => {
+    let tokens = round |> Js.String.split(" ")
+    let winStatus = (tokenToHand(tokens[0]), tokenToHand(tokens[1]))
+    // Convert win statuses to hands first in this version of the solution
+    let hand = convertWinStatusToHand(winStatus)
+
+    let score = handScore(hand)
+
+    score
+  })
+  |> Js.Array.reduce(\"+", 0)
+}
+
+```
+
+</Spoiler>
+
+## Day 3
+
+<Spoiler summaryContent="Spoiler: sollution part 1">
+
+Data is defined like this:
+
+```rescript
+let indexToPrioTuple = (charOffset, indexOffset, index, (_char, _index)): (string, int) => (
+  Js.String2.fromCharCode(charOffset + index),
+  index + indexOffset,
+)
+
+let prios = Belt.Array.concat(
+  Belt.Array.make(26, ("a", 0))->Belt.Array.mapWithIndex(indexToPrioTuple(97, 1)),
+  Belt.Array.make(26, ("a", 0))->Belt.Array.mapWithIndex(indexToPrioTuple(65, 27)),
+)
+
+
+let data = "ZNNvFWHqLNPZHHqPTHHnT
+............
+CgBClZfCflPflNZRvfQswwmwmwQsQhgppdhm"
+
+```
+
+```rescript
+let lineToRucksack = line => {
+  let length = Js.String2.length(line) / 2
+  let sackOne = Js.String2.slice(line, ~from=0, ~to_=length)->Js.String2.split("")
+  let sackTwo = Js.String2.sliceToEnd(line, ~from=length)->Js.String2.split("")
+
+  (sackOne, sackTwo)
+}
+
+let tokensToRucksacks = tokens => {
+  Js.String2.split(tokens, "\n")->Belt.Array.map(lineToRucksack)
+}
+
+let findDoublesInRucksack = ((sackOne, sackTwo)) => {
+  Belt.Array.getBy(sackOne, item => {
+    Belt.Array.some(sackTwo, other => other === item)
+  })
+}
+
+let getPrioForToken = token => {
+  switch token {
+  | None => 0
+  | Some(token) => {
+      let result = Belt.Array.getBy(DayThreeInput.prios, ((t, _p)) => t === token)
+
+      switch result {
+      | Some((_, prio)) => prio
+      | None => 0
+      }
+    }
+  }
+}
+
+let getAllDoublesInRucksacks = () => {
+  let rucksacks = tokensToRucksacks(DayThreeInput.data)
+
+  Belt.Array.map(rucksacks, findDoublesInRucksack)
+  ->Belt.Array.map(getPrioForToken)
+  ->Belt.Array.reduce(0, \"+")
+}
+
+```
+
+<pre>{JSON.stringify(getAllDoublesInRucksacks(), null, 2)}</pre>
+
+</Spoiler>
+
+<Spoiler summaryContent="Spoiler: sollution part 2">
+
+```rescript
+let rec chunk = (array, length) => {
+  let part = Belt.Array.slice(array, ~offset=0, ~len=length)
+  let rest = Belt.Array.sliceToEnd(array, length)
+  switch rest {
+  | [] => list{part}
+  | _ => list{part, ...chunk(rest, length)}
+  }
+}
+
+let badgePrioInGroup = (group: array<array<string>>) => {
+  let leader = Belt.Array.get(group, 0)
+  let second = Belt.Array.get(group, 1)
+  let third = Belt.Array.get(group, 2)
+
+  switch (leader, second, third) {
+  | (Some(leader), Some(second), Some(third)) =>
+    Belt.Array.getBy(leader, token => {
+      let s = Belt.Array.getBy(second, t => token === t)
+      let t = Belt.Array.getBy(third, t => token === t)
+      switch (s, t) {
+      | (Some(_), Some(_)) => true
+      | (_, _) => false
+      }
+    })->DayThree.getPrioForToken
+  | (_, _, _) => 0
+  }
+}
+
+let rec calculateTotalPrioForBadges = groups => {
+  switch groups {
+  | list{} => 0
+  | list{group, ...rest} => badgePrioInGroup(group) + calculateTotalPrioForBadges(rest)
+  }
+}
+
+let getElfGroups = () => {
+  Js.String2.split(DayThreeInput.data, "\n")
+  ->Belt.Array.map(Js.String.split(""))
+  ->chunk(3)
+  ->calculateTotalPrioForBadges
+}
+
+```
+
+<pre>{JSON.stringify(getElfGroups(), null, 2)}</pre>
+
+</Spoiler>
+
+export const config = {
+  title: "Advent of Code 2022 Day 1 to 3",
+};

@@ -7,6 +7,7 @@ export default {
     // "./{_s,client,components,layouts,pages,rescript}/*.{js,mdx,res}",
     // "./{_s,client,components,layouts,pages,rescript}/**/*.{js,mdx,res}",
     "./_s/**/*.js",
+    "./layouts/**/*.js",
     "./styles/base.css",
   ],
   theme: {

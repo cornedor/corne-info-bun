@@ -1,4 +1,21 @@
-import { Stacks } from "../../rescript/DayFiveRender";
+import { make as Spoiler } from "../../rescript/components/Spoiler";
+import {
+  getFullOverlapsInSchema,
+  getPartialOverlapsInSchema,
+} from "../../rescript/aoc22/DayFour";
+import { Stacks } from "../../rescript/aoc22/DayFiveRender";
+
+## Day 4
+
+It is a bit late, but here is my atempt for day 4.
+
+### Part 1
+
+<Spoiler summaryContent="Spoiler: sollution">
+  {JSON.stringify(getFullOverlapsInSchema(), null, 2)}
+  <br />
+  {JSON.stringify(getPartialOverlapsInSchema(), null, 2)}
+</Spoiler>
 
 ## Day 5
 
