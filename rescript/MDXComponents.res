@@ -1,4 +1,4 @@
-type props = {children: React.element}
+type props = {children: React.element, className?: string}
 type linkProps = {children: React.element, href: string, rel: option<string>}
 
 type components = {
@@ -12,6 +12,8 @@ type components = {
   h4: JsxU.component<props>,
   h5: JsxU.component<props>,
   em: JsxU.component<props>,
+  code: JsxU.component<props>,
+  pre: JsxU.component<props>,
 }
 
 let components = {
@@ -29,4 +31,13 @@ let components = {
   h4: ({children}) => <h4 className="text-xl font-bold"> children </h4>,
   h5: ({children}) => <h5 className="font-bold"> children </h5>,
   em: ({children}) => <em className="italic"> children </em>,
+  pre: props => {
+    let preClassName = "overflow-auto rounded shadow bg-stone-50 p-2"
+    switch props {
+    | {className: ?None, children} => <pre className=preClassName> children </pre>
+    | {className: ?Some(className), children} =>
+      <pre className={preClassName ++ className}> children </pre>
+    }
+  },
+  code: ({children}) => <code className="italic"> children </code>,
 }
