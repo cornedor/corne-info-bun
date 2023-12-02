@@ -41,7 +41,7 @@ let extractNumbers = (numbers, line): int => {
       | _ => (lowestIndex, lowestIndexValue)
       }
     }, first)
-  | None => raise(Not_found)
+  | None => (0, 0)
   }
 
   let tail = lastNumberIndices[0]
@@ -53,7 +53,7 @@ let extractNumbers = (numbers, line): int => {
       | _ => (lowestIndex, lowestIndexValue)
       }
     }, first)
-  | None => raise(Not_found)
+  | None => (0, 0)
   }
 
   first * 10 + last
