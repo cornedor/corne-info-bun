@@ -10,6 +10,17 @@ let make: Page.makeFn = () => {
   <ol className="list-roman pl-5 pt-20" reversed={true}>
     <li>
       <NavLink
+        href="/posts/advent-of-code-2023-day-4-to-6"
+        className="mb-2 flex w-full flex-col justify-between md:flex-row md:items-center">
+        <span> {React.string("Advent of Code 2023 Day 4 to 6")} </span>
+        <span className="m-2 hidden h-[2px] flex-1 bg-stone-300 dark:bg-stone-700 md:block" />
+        <span className="text-sm text-stone-600 md:text-base md:text-inherit">
+          {React.string(Intl.DateTimeFormat.format(formatter, Date.fromString("2023-12-04")))}
+        </span>
+      </NavLink>
+    </li>
+    <li>
+      <NavLink
         href="/posts/advent-of-code-2023-day-1-to-3"
         className="mb-2 flex w-full flex-col justify-between md:flex-row md:items-center">
         <span> {React.string("Advent of Code 2023 Day 1 to 3")} </span>
