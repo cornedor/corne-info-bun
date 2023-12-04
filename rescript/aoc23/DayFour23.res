@@ -24,27 +24,19 @@ let processCards = cards => {
   Array.map(cards, countWinningNumbers)->Array.reduce(0, (total, item) => total + item)
 }
 
-let rec countWinningCards = (cards, start, amount, counter, dbg) => {
+let rec countWinningCards = (cards, start, amount, dbg) => {
   Js.log(dbg)
-  counter := counter.contents + 1
   let slice = Array.slice(cards, ~start, ~end=start + amount)
-  slice
-  ->Array.mapWithIndex((card, i) => {
+
+  let copies = slice->Array.mapWithIndex((card, i) => {
     let matches = Array.length(getMatches(card))
     switch Array.length(slice) {
-    | 0 => amount
+    | 0 => 0
     | _ =>
-      amount +
-      countWinningCards(
-        cards,
-        start + i + 1,
-        matches,
-        counter,
-        dbg ++ " " ++ Int.toString(card.id) ++ " ->",
-      )
+      countWinningCards(cards, start + i + 1, matches, dbg ++ " " ++ Int.toString(card.id) ++ " ->")
     }
   })
-  ->Array.reduce(0, \"+")
+  Array.reduce(copies, 0, \"+") + Array.length(copies)
 }
 
 // Parsing data to a type
@@ -99,14 +91,9 @@ let runPart1 = () => inputToCards(DayFour23Input.data)->processCards
 
 let runExample2 = () => {
   let cards = inputToCards(DayFour23Input.exampleData)
-  let counter = ref(-1)
-  let _ = countWinningCards(cards, 0, Array.length(cards), counter, "start ->")
-  counter
+  countWinningCards(cards, 0, Array.length(cards), "start ->")
 }
 let runPart2 = () => {
   let cards = inputToCards(DayFour23Input.data)
-  let counter = ref(-1)
-
-  let res = countWinningCards(cards, 0, Array.length(cards), counter, "start ->")
-  counter
+  countWinningCards(cards, 0, Array.length(cards), "start ->")
 }
