@@ -126,7 +126,7 @@ let mapValues = (maps, seed) => {
   })
 }
 
-let parseData = data => {
+let parseData = (data, chunks) => {
   let lines = String.split(data, "\n")
 
   let seedsLine = switch lines[0] {
@@ -141,19 +141,6 @@ let parseData = data => {
   let mappedSeeds = Array.map(seeds, v => mapValues(maps, v))
 
   let minPos = ref(99999999999.0)
-
-  let chunks = [
-    (2149186375.0, 163827995.0),
-    (1217693442.0, 67424215.0),
-    (365381741.0, 74637275.0),
-    (1627905362.0, 77016740.0),
-    (22956580.0, 60539394.0),
-    (586585112.0, 391263016.0),
-    (2740196667.0, 355728559.0),
-    (2326609724.0, 132259842.0),
-    (2479354214.0, 184627854.0),
-    (3683286274.0, 337630529.0),
-  ]
 
   Array.forEach(chunks, ((rangeStart, rangeLength)) => {
     Js.log2("Looping over this many items:", rangeLength)
@@ -176,5 +163,29 @@ let parseData = data => {
   (seeds, maps, mappedSeeds, Math.minMany(mappedSeeds), minPos.contents)
 }
 
-// Js.log(parseData(DayFive23Input.exampleData))
-Js.log(parseData(DayFive23Input.data))
+let getMaps = () => {
+  let lines = String.split(DayFive23Input.data, "\n")
+  let mapLines = Array.sliceToEnd(lines, ~start=2)
+  let (maps, _) = parseLines(mapLines)
+  maps
+}
+
+// let runExample1 = parseData(DayFive23Input.exampleData)
+// Js.log(parseData(DayFive23Input.exampleData, [(79.0, 14.0), (55.0, 13.0)]))
+// Js.log(
+//   parseData(
+//     DayFive23Input.data,
+//     [
+//       (2149186375.0, 163827995.0),
+//       (1217693442.0, 67424215.0),
+//       (365381741.0, 74637275.0),
+//       (1627905362.0, 77016740.0),
+//       (22956580.0, 60539394.0),
+//       (586585112.0, 391263016.0),
+//       (2740196667.0, 355728559.0),
+//       (2326609724.0, 132259842.0),
+//       (2479354214.0, 184627854.0),
+//       (3683286274.0, 337630529.0),
+//     ],
+//   ),
+// )
