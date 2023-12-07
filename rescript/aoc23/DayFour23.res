@@ -86,14 +86,17 @@ let inputToCards = input =>
     }
   })
 
-let runExample1 = () => inputToCards(DayFour23Input.exampleData)->processCards
-let runPart1 = () => inputToCards(DayFour23Input.data)->processCards
+let exampleData = await Bun.file(~path="./inputs/d4-example.aoc")->Bun.BunFile.text
+let data = await Bun.file(~path="./inputs/d4-input.aoc")->Bun.BunFile.text
+
+let runExample1 = () => inputToCards(exampleData)->processCards
+let runPart1 = () => inputToCards(data)->processCards
 
 let runExample2 = () => {
-  let cards = inputToCards(DayFour23Input.exampleData)
+  let cards = inputToCards(exampleData)
   countWinningCards(cards, 0, Array.length(cards), "start ->")
 }
 let runPart2 = () => {
-  let cards = inputToCards(DayFour23Input.data)
+  let cards = inputToCards(data)
   countWinningCards(cards, 0, Array.length(cards), "start ->")
 }

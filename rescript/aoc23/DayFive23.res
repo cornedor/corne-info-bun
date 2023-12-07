@@ -163,29 +163,36 @@ let parseData = (data, chunks) => {
   (seeds, maps, mappedSeeds, Math.minMany(mappedSeeds), minPos.contents)
 }
 
-let getMaps = () => {
-  let lines = String.split(DayFive23Input.data, "\n")
-  let mapLines = Array.sliceToEnd(lines, ~start=2)
-  let (maps, _) = parseLines(mapLines)
-  maps
+let rec chunkNumbers = items => {
+  switch Array.length(items) {
+  | 0 | 1 => []
+  | _ =>
+    Array.concat(
+      [Array.slice(items, ~start=0, ~end=2)],
+      chunkNumbers(Array.sliceToEnd(items, ~start=2)),
+    )
+  }
 }
 
-// let runExample1 = parseData(DayFive23Input.exampleData)
-// Js.log(parseData(DayFive23Input.exampleData, [(79.0, 14.0), (55.0, 13.0)]))
-// Js.log(
-//   parseData(
-//     DayFive23Input.data,
-//     [
-//       (2149186375.0, 163827995.0),
-//       (1217693442.0, 67424215.0),
-//       (365381741.0, 74637275.0),
-//       (1627905362.0, 77016740.0),
-//       (22956580.0, 60539394.0),
-//       (586585112.0, 391263016.0),
-//       (2740196667.0, 355728559.0),
-//       (2326609724.0, 132259842.0),
-//       (2479354214.0, 184627854.0),
-//       (3683286274.0, 337630529.0),
-//     ],
-//   ),
-// )
+let lineToSeedRanges = line => {
+  let numbers = String.split(line, " ")->Array.map(item =>
+    switch Belt.Float.fromString(item) {
+    | Some(n) => n
+    | None => 0.0
+    }
+  )
+  chunkNumbers(numbers)
+}
+
+let getMaps = async path => {
+  let text = await Bun.file(~path)->Bun.BunFile.text
+  let lines = String.split(text, "\n")
+  let seedLine = switch lines[0] {
+  | None => ""
+  | Some(line) => String.replace(line, "seeds: ", "")
+  }
+  let seedRanges = lineToSeedRanges(seedLine)
+  let mapLines = Array.sliceToEnd(lines, ~start=2)
+  let (maps, _) = parseLines(mapLines)
+  (maps, seedRanges)
+}

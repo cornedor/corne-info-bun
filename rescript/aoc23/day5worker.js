@@ -9,7 +9,7 @@ import { logWithTime } from "./day5logger";
  */
 self.onmessage = (event) => {
   logWithTime("Worker started...")
-  const maps = getMaps()
+  const [maps] = getMaps()
   const { rangeStart, rangeLength } = JSON.parse(event.data)
   let minPos = Number.MAX_VALUE
   for (let i = 0; i < rangeLength; i++) {

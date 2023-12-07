@@ -1,3 +1,6 @@
+let exampleData = await Bun.file(~path="./inputs/d2-example.aoc")->Bun.BunFile.text
+let data = await Bun.file(~path="./inputs/d2-input.aoc")->Bun.BunFile.text
+
 type round = {
   red: int,
   green: int,
@@ -75,8 +78,8 @@ let run2 = data => {
   })
 }
 
-let runExample1 = () => run1(DayTwo23Input.exampleData)
-let runPart1 = () => run1(DayTwo23Input.data)
+let runExample1 = () => run1(exampleData)
+let runPart1 = () => run1(data)
 
-let runExample2 = () => run2(DayTwo23Input.exampleData)
-let runPart2 = () => run2(DayTwo23Input.data)
+let runExample2 = () => run2(exampleData)
+let runPart2 = () => run2(data)

@@ -171,3 +171,8 @@ dist
 /_s/
 /lib/
 *.js
+
+
+# AoC
+
+*.aoc

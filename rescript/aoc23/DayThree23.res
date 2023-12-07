@@ -1,3 +1,6 @@
+let exampleData = await Bun.file(~path="./inputs/d3-example.aoc")->Bun.BunFile.text
+let data = await Bun.file(~path="./inputs/d3-input.aoc")->Bun.BunFile.text
+
 type partType = Gear(int) | Unkown(string)
 type enginePart = {
   number: string,
@@ -136,8 +139,8 @@ let getPartsWithSymbol = data =>
     }
   })
 
-let runExample1 = () => getPartsWithSymbol(DayThree23Input.exampleData)
-let runPart1 = () => getPartsWithSymbol(DayThree23Input.data)
+let runExample1 = () => getPartsWithSymbol(exampleData)
+let runPart1 = () => getPartsWithSymbol(data)
 
 let setGearInMap = (gears, id, part) => {
   switch Belt.Map.Int.get(gears, id) {
@@ -173,5 +176,5 @@ let getGears = (data: array<enginePart>) => {
   })
 }
 
-let runExample2 = () => buildGrid(DayThree23Input.exampleData)->getGears
-let runPart2 = () => buildGrid(DayThree23Input.data)->getGears
+let runExample2 = () => buildGrid(exampleData)->getGears
+let runPart2 = () => buildGrid(data)->getGears

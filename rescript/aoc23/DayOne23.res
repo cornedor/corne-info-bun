@@ -1,3 +1,7 @@
+let exampleData1 = await Bun.file(~path="./inputs/d1-example-1.aoc")->Bun.BunFile.text
+let exampleData2 = await Bun.file(~path="./inputs/d1-example-2.aoc")->Bun.BunFile.text
+let data = await Bun.file(~path="./inputs/d1-input.aoc")->Bun.BunFile.text
+
 let basicNumbers =
   Array.make(~length=9, 0)->Js.Array2.mapi((_, i) => (Belt.Int.toString(i + 1), i + 1))
 
@@ -60,16 +64,16 @@ let extractNumbers = (numbers, line): int => {
 }
 
 let runExample1 = () =>
-  Js.Array2.map(DayOne23Input.exampleData->String.split("\n"), item =>
+  Js.Array2.map(exampleData1->String.split("\n"), item =>
     extractNumbers(wordNumbers, item)
   )->Array.reduce(0, \"+")
 
 let runExample2 = () =>
-  Js.Array2.map(DayOne23Input.exampleData2->String.split("\n"), item =>
+  Js.Array2.map(exampleData2->String.split("\n"), item =>
     extractNumbers(wordNumbers, item)
   )->Array.reduce(0, \"+")
 
-let input = DayOne23Input.data->Js.String2.split("\n")
+let input = data->Js.String2.split("\n")
 let runPart1 = () =>
   Array.map(input, item => extractNumbers(basicNumbers, item))->Array.reduce(0, \"+")
 let runPart2 = () =>
