@@ -48,7 +48,7 @@ let getHandType = cards => {
     })
     ->Array.filter(((_, count)) => count != 1)
 
-  let jokers = Array.filter(cards, b => b.cardType === "J")->Array.length
+  let jokers = Array.filter(cards, b => b.cardType == "J")->Array.length
 
   let fiveOfAKind = Array.find(ofAKinds, ((_, count)) => count == 5)
   let fourOfAKind = Array.find(ofAKinds, ((_, count)) => count == 4)
@@ -207,5 +207,5 @@ let parseInput = async path => {
   ->Array.reduceWithIndex(0, (total, item, index) => total + item.bid * (index + 1))
 }
 
-Js.log(await parseInput("./inputs/day7-example.aoc"))
-Js.log(await parseInput("./inputs/day7-input.aoc"))
+Js.log(await parseInput("./inputs/d7-example.aoc"))
+Js.log(await parseInput("./inputs/d7-input.aoc"))

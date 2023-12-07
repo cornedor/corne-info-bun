@@ -41,7 +41,7 @@ let getHandTypeRank = handType =>
 
 let getHandType = cards => {
   let ofAKinds = Array.map(cards, card => {
-    (card.cardType, Array.filter(cards, b => b.cardType === card.cardType)->Array.length)
+    (card.cardType, Array.filter(cards, b => b.cardType == card.cardType)->Array.length)
   })->Array.filter(((_, count)) => count != 1)
 
   let fiveOfAKind = Array.find(ofAKinds, ((_, count)) => count == 5)
@@ -176,10 +176,7 @@ let parseInput = async path => {
   //   item.cardsStr
   // })
   ->Array.reduceWithIndex(0, (total, item, index) => total + item.bid * (index + 1))
-
-  // ->Array.toSorted((a, b) => Belt.Float.fromInt(a.cardRank - b.cardRank))
-  // ->Array.toSorted((a, b) => Belt.Float.fromInt(a.typeRank > b.typeRank ? -1 : 1))
 }
 
-Js.log(await parseInput("./inputs/day7-example.aoc"))
-Js.log(await parseInput("./inputs/day7-input.aoc"))
+Js.log(await parseInput("./inputs/d7-example.aoc"))
+Js.log(await parseInput("./inputs/d7-input.aoc"))

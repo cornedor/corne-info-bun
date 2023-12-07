@@ -73,7 +73,7 @@ let rec findNextPart = (data, index, lineWidth) => {
           | Some(Gear(index)) => {
               let included = Array.some(filtered, item =>
                 switch item {
-                | Some(Gear(subIndex)) => subIndex === index
+                | Some(Gear(subIndex)) => subIndex == index
                 | _ => false
                 }
               )
