@@ -11,7 +11,6 @@ let getNextStep = (instruction, currentPosition) =>
       let (_, right) = currentPosition
       right
     }
-
   | _ => raise(Not_found)
   }
 
@@ -76,10 +75,7 @@ let getOptions = (instructions, map: Belt.Map.String.t<(string, string)>, keys: 
 }
 
 let parseLines = (text, runFirst) => {
-  let instructions = switch Aoc.lineAt(text, 0) {
-  | Some(rl) => String.split(rl, "")
-  | _ => []
-  }
+  let instructions = Aoc.splitStringList(Aoc.ensureSome(Aoc.lineAt(text, 0)), ~delimiter="")
 
   let empty: Belt.Map.String.t<(string, string)> = Belt.Map.String.empty
   let map = Aoc.toLinesEnd(text, ~start=2)->Array.reduce(empty, (mapping, line) => {
