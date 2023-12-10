@@ -33,3 +33,15 @@ let ensureSome = value =>
       panic("Could not ensure value. See log for more details")
     }
   }
+
+let logList = list => Js.log2("list", List.fromArray(list))
+let logList2 = (tag, list) => Js.log3(tag, "list", List.fromArray(list))
+
+let posFromIndex = (lineWidth, index) => {
+  let x = mod(index, lineWidth)
+  let y = index / lineWidth
+  (x, y)
+}
+let posToIndex = (lineWidth, x, y) => x + y * lineWidth
+
+let charAtPos = (str, lineWidth, x, y) => String.charAt(str, posToIndex(lineWidth, x, y))

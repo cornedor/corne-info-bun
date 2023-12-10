@@ -1,7 +1,6 @@
 let exampleData1 = await Bun.file(~path="./inputs/d1-example-1.aoc")->Bun.BunFile.text
 let exampleData2 = await Bun.file(~path="./inputs/d1-example-2.aoc")->Bun.BunFile.text
 let data = await Bun.file(~path="./inputs/d1-input.aoc")->Bun.BunFile.text
-let koen = await Bun.file(~path="./inputs/d1-koen.aoc")->Bun.BunFile.text
 
 let basicNumbers =
   Array.make(~length=9, 0)->Js.Array2.mapi((_, i) => (Belt.Int.toString(i + 1), i + 1))
@@ -83,7 +82,7 @@ let runPart2 = () =>
   Array.map(input, item => extractNumbers(wordNumbers, item))->Array.reduce(0, \"+")
 
 let runPart1_1 = () =>
-  Array.map(koen->Js.String2.split("\n"), item => extractNumbers(wordNumbers, item))->Array.reduce(
+  Array.map(data->Js.String2.split("\n"), item => extractNumbers(wordNumbers, item))->Array.reduce(
     0,
     \"+",
   )

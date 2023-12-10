@@ -30,15 +30,8 @@ let parseSensorData = async path => {
   Js.log2(
     "Result",
     Array.reduce(lines, (0, 0), ((left, right), line) => {
-      let lineRight = List.reduce(line, 0, (total, subline) => {
-        total + List.reverse(subline)->List.headExn
-      })
-      let lineLeft =
-        line
-        ->List.reverse
-        ->List.reduce(0, (total, subline) => {
-          subline->List.headExn - total
-        })
+      let lineRight = line->List.map(ListUtils.lastExn)->List.reduce(0, \"+")
+      let lineLeft = line->List.map(List.headExn)->List.reverse->List.reduce(0, (t, s) => s - t)
 
       (left + lineLeft, right + lineRight)
     }),
