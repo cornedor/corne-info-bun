@@ -13,6 +13,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
+    "rescript": "rescript",
     "tailwindcss": "tailwindcss"
   },
   "dependencies": {

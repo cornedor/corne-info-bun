@@ -34,8 +34,8 @@ let ensureSome = value =>
     }
   }
 
-let logList = list => Js.log2("list", List.fromArray(list))
-let logList2 = (tag, list) => Js.log3(tag, "list", List.fromArray(list))
+let logList = list => Js.log2("list", List.toArray(list))
+let logList2 = (tag, list) => Js.log3(tag, "list", List.toArray(list))
 
 let posFromIndex = (lineWidth, index) => {
   let x = mod(index, lineWidth)
