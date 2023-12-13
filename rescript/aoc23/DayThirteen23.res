@@ -77,15 +77,16 @@ let findMirrors = (text, corrections) => {
 
     let (a, _) = findHMirror(map, 0, corrections)
     let (b, _) = findHMirror(rotateInput(map), 0, corrections)
-    // Js.log3(_index, a, b)
+    Js.log3(_index, a, b)
 
     a * 100 + b
   })
   ->Array.reduce(0, \"+")
 }
 
-Js.log2("Example Part 1:", findMirrors(await Aoc.readInput("inputs/d13-example.aoc"), 0))
-Js.log2("Input Part 1:", findMirrors(await Aoc.readInput("inputs/d13-input.aoc"), 0))
+// Js.log2("Example Part 1:", findMirrors(await Aoc.readInput("inputs/d13-example.aoc"), 0))
+// Js.log2("Input Part 1:", findMirrors(await Aoc.readInput("inputs/d13-input.aoc"), 0))
 
-Js.log2("Example Part 2:", findMirrors(await Aoc.readInput("inputs/d13-example.aoc"), 1))
-Js.log2("Input Part 2:", findMirrors(await Aoc.readInput("inputs/d13-input.aoc"), 1))
+// Js.log2("Example Part 2:", findMirrors(await Aoc.readInput("inputs/d13-example.aoc"), 1))
+// Js.log2("Input Part 2:", findMirrors(await Aoc.readInput("inputs/d13-input.aoc"), 1))
+Js.log2("Input Part 2:", findMirrors(await Aoc.readInput("inputs/d13-bram.aoc"), 0))
