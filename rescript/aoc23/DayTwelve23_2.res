@@ -51,9 +51,7 @@ let parseMask = (str): mask => {
 
 // This function checks if a check is allowed in its position using the mask.
 let allowedByMask = (startAt: int, (pos, width): check, mask: mask, lookForward: bool) => {
-  // Js.log((pos, width))
-  // Js.log4(printMask(mask), printCheck(list{(pos, width)}), startAt, lookForward)
-  let res = !Array.someWithIndex(mask, (item, i) => {
+  !Array.someWithIndex(mask, (item, i) => {
     let isInRange = i >= pos && i < pos + width
     let isPastRange = i > pos + width
 
@@ -74,10 +72,6 @@ let allowedByMask = (startAt: int, (pos, width): check, mask: mask, lookForward:
     | #unknown => false
     }
   })
-
-  // Js.log2("////", res)
-
-  res
 }
 
 Js.log2("allowedByMask", allowedByMask(0, (0, 3), parseMask("###.????.###"), true))
@@ -104,8 +98,6 @@ let rec findMatches = (
   let result = switch Map.get(cache, cacheKey) {
   | Some(cached) => cached
   | None =>
-    // Js.log2(cache, cacheKey)
-    // Js.log2(printMask(mask), startAt)
     switch checks {
     | list{} => 0.0
     | list{(pos, width)} if pos + width > maskWidth =>
@@ -165,10 +157,7 @@ let checkInput = (text, unfold) => {
         let check = Array.joinWith([check, check, check, check, check], ",")
         let check = Aoc.splitIntList(check, ~delimiter=",")
         let cache: Map.t<string, float> = Map.make()
-        let res = findMatches(settleInitialPositions(check), mask, Array.length(mask), 0, cache)
-
-        // Js.log2("Result!", res)
-        res
+        findMatches(settleInitialPositions(check), mask, Array.length(mask), 0, cache)
       }
     | _ => panic("Incorrect input")
     }
