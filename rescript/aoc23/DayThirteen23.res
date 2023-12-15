@@ -56,17 +56,10 @@ let rec findHMirror = (lines, offset, corrections): (int, int) => {
   }
 }
 
-let u = Array.getUnsafe
-let rotateArray = arr => {
-  Array.mapWithIndex(u(arr, 0), (_, index) => {
-    Array.map(arr, row => u(row, index))
-  })
-}
-
 let rotateInput = arr => {
   arr
   ->Array.map(line => String.split(line, ""))
-  ->rotateArray
+  ->Aoc.transposeArray
   ->Array.map(line => Array.joinWith(line, ""))
 }
 

@@ -45,3 +45,10 @@ let posFromIndex = (lineWidth, index) => {
 let posToIndex = (lineWidth, x, y) => x + y * lineWidth
 
 let charAtPos = (str, lineWidth, x, y) => String.charAt(str, posToIndex(lineWidth, x, y))
+
+let _u = Array.getUnsafe
+let transposeArray = arr => {
+  Array.mapWithIndex(_u(arr, 0), (_, index) => {
+    Array.map(arr, row => _u(row, index))
+  })
+}
