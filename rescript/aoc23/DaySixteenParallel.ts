@@ -13,50 +13,73 @@ async function startWorkers(
   count: number,
   payloadGenerator: (i: number) => any
 ) {
-  let workers: Array<Promise<number>> = [];
-  for (let i = 0; i < count; i++) {
-    workers.push(
-      new Promise((resolve) => {
-        const worker = new Worker(workerURL);
-        worker.onmessage = (e) => {
-          console.log(i, "...", e.data);
-          resolve(Number(e.data));
-          worker.terminate();
-        };
-        // worker.postMessage(
-        //   JSON.stringify({
-        //     pos: [0, i],
-        //     dir: [1, 0],
-        //   })
-        // );
-        worker.postMessage(JSON.stringify(payloadGenerator(i)));
-      })
-    );
+  let optionsA: Array<{
+    pos: [number, number];
+    dir: [number, number];
+  }> = [];
+  let optionsB: Array<{
+    pos: [number, number];
+    dir: [number, number];
+  }> = [];
+  let step = Math.floor(count / 2);
+  for (let i = 0; i < step; i++) {
+    optionsA.push(payloadGenerator(i));
   }
-  let results = (await Promise.all(workers)).map((item) => Number(item));
-  maxAreaEngergized = Math.max(maxAreaEngergized, ...results);
+  for (let i = step; i < count; i++) {
+    optionsB.push(payloadGenerator(i));
+  }
+
+  const resultA: Promise<number> = new Promise((resolve) => {
+    const worker = new Worker(workerURL);
+    worker.onmessage = (e) => {
+      resolve(Number(e.data));
+      worker.terminate();
+    };
+    worker.postMessage(JSON.stringify(optionsA));
+  });
+  const resultB: Promise<number> = new Promise((resolve) => {
+    const worker = new Worker(workerURL);
+    worker.onmessage = (e) => {
+      resolve(Number(e.data));
+      worker.terminate();
+    };
+    worker.postMessage(JSON.stringify(optionsB));
+  });
+
+  let res = await Promise.all([resultA, resultB]);
+
+  console.log(res);
+
+  maxAreaEngergized = Math.max(maxAreaEngergized, ...res);
 }
 
-await startWorkers(height, (i) => ({
-  pos: [i, 0],
-  dir: [0, 1],
-}));
-console.timeLog("startParallel");
-await startWorkers(height, (i) => ({
-  pos: [i, height - 1],
-  dir: [0, -1],
-}));
-console.timeLog("startParallel");
+const workers = [];
+workers.push(
+  startWorkers(height, (i) => ({
+    pos: [i, 0],
+    dir: [0, 1],
+  }))
+);
+workers.push(
+  startWorkers(height, (i) => ({
+    pos: [i, height - 1],
+    dir: [0, -1],
+  }))
+);
+workers.push(
+  startWorkers(height, (i) => ({
+    pos: [0, i],
+    dir: [1, 0],
+  }))
+);
+workers.push(
+  startWorkers(height, (i) => ({
+    pos: [width - 1, i],
+    dir: [-1, 0],
+  }))
+);
 
-await startWorkers(height, (i) => ({
-  pos: [0, i],
-  dir: [1, 0],
-}));
-console.timeLog("startParallel");
-await startWorkers(height, (i) => ({
-  pos: [width - 1, i],
-  dir: [-1, 0],
-}));
-console.timeLog("startParallel");
+await Promise.all(workers);
 
 console.log("Results", maxAreaEngergized);
+console.timeEnd("startParallel");

@@ -21,12 +21,12 @@ let map = Array.map(input, line =>
   )
 )
 
-@genType
-let energized = Array.map(input, line => Array.map(line, _ => false))
+// @genType
+// let energized = Array.map(input, line => Array.map(line, _ => false))
 
 type xy = (int, int)
 
-let energize = ((x, y): xy): int => {
+let energize = ((x, y): xy, energized): int => {
   let line = energized[y]
   switch line {
   | Some(line) =>
@@ -49,8 +49,6 @@ let getTile = ((x, y): xy): option<tile> => {
   }
 }
 
-let cache = Map.make()
-
 let getCacheKey = ((x, y), (mx, my)) => {
   Int.toStringWithRadix(x, ~radix=36) ++
   ":" ++
@@ -62,12 +60,12 @@ let getCacheKey = ((x, y), (mx, my)) => {
 }
 
 @genType
-let rec walkMap = (pos: xy, movement: xy, power: int) => {
+let rec walkMap = (pos: xy, movement: xy, power: int, cache, energized) => {
   let cacheKey = getCacheKey(pos, movement)
   switch Map.get(cache, cacheKey) {
   | Some(cached) => cached
   | None => {
-      let isEnergized = energize(pos)
+      let isEnergized = energize(pos, energized)
       Map.set(cache, cacheKey, true)
 
       switch isEnergized {
@@ -79,20 +77,27 @@ let rec walkMap = (pos: xy, movement: xy, power: int) => {
             let (posX, posY) = pos
             let (movX, movY) = movement
             switch tile {
-            | Air => walkMap((posX + movX, posY + movY), (movX, movY), power)
+            | Air => walkMap((posX + movX, posY + movY), (movX, movY), power, cache, energized)
             | SplitterHorizontal if movY == 0 =>
-              walkMap((posX + movX, posY + movY), (movX, movY), power)
+              walkMap((posX + movX, posY + movY), (movX, movY), power, cache, energized)
             | SplitterVertical if movX == 0 =>
-              walkMap((posX + movX, posY + movY), (movX, movY), power)
+              walkMap((posX + movX, posY + movY), (movX, movY), power, cache, energized)
             | SplitterHorizontal =>
-              let _ = walkMap((posX + 1, posY), (1, 0), power)
-              walkMap((posX - 1, posY), (-1, 0), power)
+              let _ = walkMap((posX + 1, posY), (1, 0), power, cache, energized)
+              walkMap((posX - 1, posY), (-1, 0), power, cache, energized)
             | SplitterVertical =>
-              let _ = walkMap((posX, posY + 1), (0, 1), power)
-              walkMap((posX, posY - 1), (0, -1), power)
-            | MirrorTopRight => walkMap((posX + movY, posY + movX), (movY, movX), power)
+              let _ = walkMap((posX, posY + 1), (0, 1), power, cache, energized)
+              walkMap((posX, posY - 1), (0, -1), power, cache, energized)
+            | MirrorTopRight =>
+              walkMap((posX + movY, posY + movX), (movY, movX), power, cache, energized)
             | MirrorTopLeft =>
-              walkMap((posX + (0 - movY), posY + (0 - movX)), (0 - movY, 0 - movX), power)
+              walkMap(
+                (posX + (0 - movY), posY + (0 - movX)),
+                (0 - movY, 0 - movX),
+                power,
+                cache,
+                energized,
+              )
             }
           }
         | None => true
@@ -103,8 +108,18 @@ let rec walkMap = (pos: xy, movement: xy, power: int) => {
 }
 
 @genType
-let countEnergized = () => {
+let countEnergized = energized => {
   Array.reduce(energized, 0, (acc, line) => acc + Array.length(Array.filter(line, item => item)))
+}
+
+@genType
+let throwRay = (pos: xy, movement: xy) => {
+  let cache = Map.make()
+  let energized = Array.map(input, line => Array.map(line, _ => false))
+
+  let _ = walkMap(pos, movement, 0, cache, energized)
+
+  countEnergized(energized)
 }
 
 // Console.time("start")

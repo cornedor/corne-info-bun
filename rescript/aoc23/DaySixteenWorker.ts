@@ -1,14 +1,17 @@
-import { countEnergized, walkMap, energized } from "./DaySixteen23.gen";
+import { throwRay } from "./DaySixteen23.gen";
 
 // console.log("fooooo");
 
 self.onmessage = (event) => {
-  const data = JSON.parse(event.data) as {
+  const data = JSON.parse(event.data) as Array<{
     pos: [number, number];
     dir: [number, number];
-  };
+  }>;
 
-  walkMap(data.pos, data.dir, 1);
+  let max = 0;
+  for (const item of data) {
+    max = Math.max(max, throwRay(item.pos, item.dir));
+  }
 
-  postMessage(countEnergized());
+  postMessage(max);
 };
