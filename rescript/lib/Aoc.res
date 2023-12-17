@@ -52,3 +52,5 @@ let transposeArray = arr => {
     Array.map(arr, row => _u(row, index))
   })
 }
+
+let adjecent = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]

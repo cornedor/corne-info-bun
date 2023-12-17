@@ -23,9 +23,8 @@ let getItemAt = (data, index) => {
   }
 }
 
-let adjecent = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 let getAdjecentSymbols = (data, x, y, lineWidth) => {
-  adjecent->Array.map(((offsetX, offsetY)) => {
+  Aoc.adjecent->Array.map(((offsetX, offsetY)) => {
     let x = x + offsetX
     let y = y + offsetY
     let index = x + y * lineWidth
