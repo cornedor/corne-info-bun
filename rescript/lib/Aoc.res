@@ -43,6 +43,9 @@ let ensureSomeM = (value, message) =>
 let logList = list => Js.log2("list", List.toArray(list))
 let logList2 = (tag, list) => Js.log3(tag, "list", List.toArray(list))
 
+external parseIntWithRadix: (string, int) => int = "parseInt"
+external abs: float => float = "Math.abs"
+
 let posFromIndex = (lineWidth, index) => {
   let x = mod(index, lineWidth)
   let y = index / lineWidth
