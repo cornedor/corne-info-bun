@@ -34,6 +34,12 @@ let ensureSome = value =>
     }
   }
 
+let ensureSomeM = (value, message) =>
+  switch value {
+  | Some(value) => value
+  | None => panic("Could not ensure value: " ++ message)
+  }
+
 let logList = list => Js.log2("list", List.toArray(list))
 let logList2 = (tag, list) => Js.log3(tag, "list", List.toArray(list))
 
