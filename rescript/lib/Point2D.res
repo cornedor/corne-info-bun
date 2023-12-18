@@ -44,20 +44,20 @@ let subs = ((vx, vy), scalar: float) => {
   (vx -. scalar, vy -. scalar)
 }
 
-let exp = (vec1: t, vec2: t) => {
-  let _ = vec1
-  let _ = vec2
+let exp = (point1: t, point2: t) => {
+  let _ = point1
+  let _ = point2
 
-  %raw(`[vec1[0] ** vec2[0], vec1[1] ** vec2[0]]`)
+  %raw(`[point1[0] ** point2[0], point1[1] ** point2[0]]`)
 }
 
 let magnitude = ((x, y): t) => {
   sqrt(x *. x +. y *. y)
 }
 
-let distance = (vec1: t, vec2: t) => {
-  let (aX, aY) = vec1
-  let (bX, bY) = vec2
+let distance = (point1: t, point2: t) => {
+  let (aX, aY) = point1
+  let (bX, bY) = point2
 
   sqrt(Math.pow(aX -. bX, ~exp=2.0) +. Math.pow(aY -. bY, ~exp=2.0))
 }

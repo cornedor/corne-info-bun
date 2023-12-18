@@ -1,5 +1,5 @@
 type direction = [#R | #D | #L | #U]
-type instruction = {direction: direction, steps: int, stepsB: Vector2D.t}
+type instruction = {direction: direction, steps: int, stepsB: Point2D.t}
 
 Console.time("Initialisation")
 let instructions =
@@ -115,54 +115,30 @@ Js.log2("Result:", Array.length(Grid2D.values(grid)))
 // Part 2
 Console.time("Part 2")
 
-let polygon = []
-let rec buildPolygon = (instructions: List.t<instruction>, current: Vector2D.t) => {
+let rec buildPolygon = (instructions: List.t<instruction>, current: Point2D.t, polygon) => {
   switch instructions {
-  | list{} => ()
+  | list{} => polygon
   | list{head} => {
-      let newVec = Vector2D.add(current, head.stepsB)
-      Array.push(polygon, newVec)
+      let point = Point2D.add(current, head.stepsB)
+      Polygon2D.push(polygon, point)
+      polygon
     }
 
   | list{head, ...rest} => {
-      let newVec = Vector2D.add(current, head.stepsB)
-      Array.push(polygon, newVec)
-      buildPolygon(rest, newVec)
+      let point = Point2D.add(current, head.stepsB)
+      Polygon2D.push(polygon, point)
+      buildPolygon(rest, point, polygon)
     }
   }
 }
-
-buildPolygon(instructions, (0.0, 0.0))
+let polygon = buildPolygon(instructions, (0.0, 0.0), Polygon2D.make())
 // To print a svg polygon:
 // Js.log(Array.map(polygon, ((x, y)) => (x /. 1000.0, y /. 1000.0))->Array.joinWith(" "))
 
-let polygonPoints = Array.length(polygon)
-let x = []
-let y = []
-for p in 0 to polygonPoints - 1 {
-  let i2 = Int.mod(p + 1, polygonPoints)
-  let (x1, _) = Array.getUnsafe(polygon, Int.mod(p, polygonPoints))
-  let (_, y2) = Array.getUnsafe(polygon, i2)
+let area = Polygon2D.area(polygon)
+let outline = Polygon2D.circumference(polygon)
 
-  Array.push(x, x1 *. y2)
-}
-
-for p in 1 to polygonPoints {
-  let i2 = Int.mod(p - 1, polygonPoints)
-  let (x1, _) = Array.getUnsafe(polygon, Int.mod(p, polygonPoints))
-  let (_, y2) = Array.getUnsafe(polygon, i2)
-
-  Array.push(y, x1 *. y2)
-}
-let x = Array.reduce(x, 0.0, \"+.")
-let y = Array.reduce(y, 0.0, \"+.")
-let s = Aoc.abs(x -. y)
-let area = s /. 2.0
-
-// We calculated the area of the trench, but we dig a trench one width...
-let (outline, _) = Array.reduce(polygon, (0.0, (0.0, 0.0)), ((acc, last), cur) => {
-  (acc +. Vector2D.distance(last, cur), cur)
-})
+// We calculated the area from the center of the trench, but we dig a trench one width...
 // add 0.5 for each block + 1 for each corner
 let trenchOffset = outline /. 2.0 +. 1.0
 
