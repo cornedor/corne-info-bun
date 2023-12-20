@@ -48,7 +48,7 @@ let rec findHMirror = (lines, offset, corrections): (int, int) => {
   | offset =>
     switch checkHLine2(lines, offset, corrections) {
     | (true, v) if v == 0 => (offset + 1, v)
-    | (_, v) => {
+    | (_, _v) => {
         let res = findHMirror(lines, offset + 1, corrections)
         res
       }
