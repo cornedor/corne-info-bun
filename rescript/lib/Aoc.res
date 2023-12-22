@@ -63,3 +63,24 @@ let transposeArray = arr => {
 }
 
 let adjecent = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+let rec gcd = (a, b) => {
+  switch BigInt.fromInt(0) == b {
+  | true => a
+  | false => gcd(b, BigInt.mod(a, b))
+  }
+}
+
+let lcm = (a, b) => {
+  let div = gcd(a, b)
+  BigInt.div(BigInt.mul(a, b), div)
+}
+
+let rec lcmMany = (items: list<BigInt.t>) => {
+  switch items {
+  | list{} => panic("Programming error")
+  | list{last} => last
+  | list{head, tail} => lcm(head, tail)
+  | list{head, ...tail} => lcm(head, lcmMany(tail))
+  }
+}

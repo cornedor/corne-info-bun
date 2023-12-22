@@ -42,7 +42,7 @@ let parseLine = line => {
 }
 
 let parts =
-  (await Aoc.readInput("inputs/d20-example.aoc"))
+  (await Aoc.readInput("inputs/d20-input.aoc"))
   ->Aoc.toLinesEnd
   ->Array.map(parseLine)
   ->Map.fromArray
@@ -82,11 +82,17 @@ let countPulses = (pulse: pulse, amount: int) => {
   }
 }
 
-let runStep = (name, pulse: pulse, _from) => {
+let loop = Map.fromArray([("gs", 0), ("kd", 0), ("vg", 0), ("zf", 0)])
+
+let runStep = (name, pulse: pulse, _from, pushes) => {
   // Js.log4(_from ++ " -", pulse, "->", name)
-  switch (name, Map.get(parts, name)) {
+  let r = switch (name, Map.get(parts, name)) {
   | (name, None) if name == "output" => Js.log2("DEBUG:", pulse)
-  | (name, None) if name == "rx" => ()
+  | (name, None) if name == "rx" =>
+    switch pulse {
+    | High => ()
+    | Low => Js.log2("Got em!", pushes)
+    }
   | (name, None) => panic("Part not found in Map: " ++ name)
   | (_, Some(Broadcaster(children))) => {
       countPulses(pulse, List.length(children))
@@ -119,16 +125,44 @@ let runStep = (name, pulse: pulse, _from) => {
       })
     }
   }
+
+  switch _from {
+  | "gs" | "kd" | "vg" | "zf" =>
+    switch pulse {
+    | High =>
+      if Map.get(loop, _from)->Option.getExn < 3000 {
+        Map.set(loop, _from, pushes)
+      }
+    | Low => ()
+    }
+  | _ => ()
+  }
+
+  r
 }
 
-for _ in 1 to 1000 {
-  runStep("broadcaster", Low, "button")
+for i in 1 to 1000 {
+  // Js.log("")
+  runStep("broadcaster", Low, "button", i)
   lowSent := lowSent.contents +. 1.0
   while Array.length(queue) > 0 {
     let (child, pulse, name) = Array.shift(queue)->Option.getExn
-    runStep(child, pulse, name)
+    runStep(child, pulse, name, i)
   }
 }
 
 // Js.log("=============")
-Js.log(highSent.contents *. lowSent.contents)
+Js.log2("Part 1:", highSent.contents *. lowSent.contents)
+
+Map.forEachWithKey(state, (_v, k) => Map.set(state, k, Low))
+for i in 1 to 5000 {
+  runStep("broadcaster", Low, "button", i)
+  lowSent := lowSent.contents +. 1.0
+  while Array.length(queue) > 0 {
+    let (child, pulse, name) = Array.shift(queue)->Option.getExn
+    runStep(child, pulse, name, i)
+  }
+}
+
+let loopValues = Map.values(loop)->Core__Iterator.toArray->Array.map(BigInt.fromInt)->List.fromArray
+Js.log2("Part 2:", Aoc.lcmMany(loopValues))

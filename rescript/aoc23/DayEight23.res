@@ -45,33 +45,12 @@ let rec walkSteps = (comparator, instructions, index, currentPosition, map, coun
 let step = walkSteps(s => s == "ZZZ", ...)
 let stepZ = walkSteps(s => String.charAt(s, 2) === "Z", ...)
 
-let rec gcd = (a, b) => {
-  switch BigInt.fromInt(0) == b {
-  | true => a
-  | false => gcd(b, BigInt.mod(a, b))
-  }
-}
-
-let lcm = (a, b) => {
-  let div = gcd(a, b)
-  BigInt.div(BigInt.mul(a, b), div)
-}
-
-let rec lcmMany = (items: list<BigInt.t>) => {
-  switch items {
-  | list{} => panic("Programming error")
-  | list{last} => last
-  | list{head, tail} => lcm(head, tail)
-  | list{head, ...tail} => lcm(head, lcmMany(tail))
-  }
-}
-
 let getOptions = (instructions, map: Belt.Map.String.t<(string, string)>, keys: array<string>) => {
   let values = Array.map(keys, key => {
     BigInt.fromInt(stepZ(instructions, 0, key, map, 1))
   })->List.fromArray
 
-  lcmMany(values)
+  Aoc.lcmMany(values)
 }
 
 let parseLines = (text, runFirst) => {
