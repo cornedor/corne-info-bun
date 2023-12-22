@@ -141,28 +141,30 @@ let runStep = (name, pulse: pulse, _from, pushes) => {
   r
 }
 
-for i in 1 to 1000 {
-  // Js.log("")
-  runStep("broadcaster", Low, "button", i)
+Console.time("Loop")
+
+let i = ref(0)
+while i.contents < 100000 {
+  i := i.contents + 1
+
+  runStep("broadcaster", Low, "button", i.contents)
   lowSent := lowSent.contents +. 1.0
   while Array.length(queue) > 0 {
     let (child, pulse, name) = Array.shift(queue)->Option.getExn
-    runStep(child, pulse, name, i)
+    runStep(child, pulse, name, i.contents)
+  }
+
+  if i.contents == 1000 {
+    Js.log2("Part 1:", highSent.contents *. lowSent.contents)
+  }
+
+  if !(Map.values(loop)->Core__Iterator.toArray->Array.some(item => item == 0)) {
+    i := 100001
+
+    let loopValues =
+      Map.values(loop)->Core__Iterator.toArray->Array.map(BigInt.fromInt)->List.fromArray
+    Js.log2("Part 2:", Aoc.lcmMany(loopValues))
   }
 }
 
-// Js.log("=============")
-Js.log2("Part 1:", highSent.contents *. lowSent.contents)
-
-Map.forEachWithKey(state, (_v, k) => Map.set(state, k, Low))
-for i in 1 to 5000 {
-  runStep("broadcaster", Low, "button", i)
-  lowSent := lowSent.contents +. 1.0
-  while Array.length(queue) > 0 {
-    let (child, pulse, name) = Array.shift(queue)->Option.getExn
-    runStep(child, pulse, name, i)
-  }
-}
-
-let loopValues = Map.values(loop)->Core__Iterator.toArray->Array.map(BigInt.fromInt)->List.fromArray
-Js.log2("Part 2:", Aoc.lcmMany(loopValues))
+Console.timeEnd("Loop")
