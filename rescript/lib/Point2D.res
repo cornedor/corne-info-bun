@@ -4,6 +4,14 @@ let make = (x: float, y: float): t => {
   (x, y)
 }
 
+let fromInt = ((x, y)): t => {
+  (Float.fromInt(x), Float.fromInt(y))
+}
+
+let toInt = ((x, y)) => {
+  (Float.toInt(x), Float.toInt(y))
+}
+
 let add = ((v1x, v1y): t, (v2x, v2y): t) => {
   (v1x +. v2x, v1y +. v2y)
 }

@@ -84,3 +84,11 @@ let rec lcmMany = (items: list<BigInt.t>) => {
   | list{head, ...tail} => lcm(head, lcmMany(tail))
   }
 }
+
+@genType
+let wait = timeout =>
+  Promise.make((resolve, _reject) => {
+    let _ = setTimeout(() => {
+      resolve()
+    }, timeout)
+  })

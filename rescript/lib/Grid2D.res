@@ -1,5 +1,6 @@
 type t<'a>
 
+@genType
 type position = (int, int)
 module PositionHash = Belt.Id.MakeHashableU({
   type t = position
@@ -11,6 +12,7 @@ module PositionHash = Belt.Id.MakeHashableU({
 
 type gridMap<'a> = Belt.HashMap.t<PositionHash.t, 'a, PositionHash.identity>
 
+@genType
 type grid<'a> = {
   width: option<int>,
   height: option<int>,
@@ -96,6 +98,16 @@ let values = (grid: grid<'a>) => {
   Belt.HashMap.valuesToArray(grid.map)
 }
 
+@genType
 let forEach = (grid: grid<'a>, fn: ('key, 'value) => unit) => {
   Belt.HashMap.forEach(grid.map, fn)
+}
+
+let locate = (grid: grid<'a>, fn: ('key, 'value) => bool) => {
+  Belt.HashMap.reduce(grid.map, list{}, (acc, key, value) => {
+    switch fn(key, value) {
+    | true => list{key, ...acc}
+    | false => acc
+    }
+  })
 }

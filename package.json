@@ -33,7 +33,7 @@
     "preact-render-to-string": "^6.2.1",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
-    "rescript": "next",
+    "rescript": "11.0.0-rc.8",
     "rescript-nodejs": "^15.0.0",
     "rescript-struct": "^5.1.0",
     "rescript-webapi": "^0.9.0",
