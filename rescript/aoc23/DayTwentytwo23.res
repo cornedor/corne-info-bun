@@ -61,43 +61,55 @@ let fall = (brick: brickSnapshot, below: array<brickSnapshot>) => {
   }
 }
 
-let fallen = Array.reduce(input, [], (fallen, brick) => {
+let settled = Array.reduce(input, [], (fallen, brick) => {
   Array.unshift(fallen, fall(brick, fallen))
 
   fallen->Array.sort(((_, (_, _, zA)), (_, (_, _, zB))) => Float.fromInt(zB - zA))
   fallen
 })
 
-let map: Belt.HashMap.t<CoordsHash.t, array<int>, CoordsHash.identity> = Belt.HashMap.make(
+let supportsMap: Belt.HashMap.t<CoordsHash.t, array<int>, CoordsHash.identity> = Belt.HashMap.make(
   ~id=module(CoordsHash),
   ~hintSize=Array.length(input),
 )
 
-Array.forEach(fallen, brick => {
+let supportedByMap: Belt.HashMap.t<
+  CoordsHash.t,
+  array<int>,
+  CoordsHash.identity,
+> = Belt.HashMap.make(~id=module(CoordsHash), ~hintSize=Array.length(input))
+
+Array.forEach(settled, brick => {
   let (pos, _) = brick
-  Belt.HashMap.set(map, pos, [])
+  Belt.HashMap.set(supportsMap, pos, [])
 })
 
-Array.forEach(fallen, brick => {
+Array.forEach(settled, brick => {
   let ((x, y, z), _) = brick
   // The Z axis that is supporting the brick
   let supportingZ = z - 1
 
-  let options = Array.filter(fallen, brickB => {
+  let options = Array.filter(settled, brickB => {
     let (_pos, (_, _, upperZ)) = brickB
     upperZ == supportingZ && hasOverlap(brickB, brick)
   })
 
   Array.forEach(options, ((opt, _)) => {
-    switch Belt.HashMap.get(map, opt) {
-    | None => Belt.HashMap.set(map, opt, [hash((x, y, z))])
-    | Some(arr) => Belt.HashMap.set(map, opt, Array.concat(arr, [hash((x, y, z))]))
+    switch Belt.HashMap.get(supportedByMap, (x, y, z)) {
+    | None => Belt.HashMap.set(supportedByMap, (x, y, z), [hash(opt)])
+    | Some(arr) => Belt.HashMap.set(supportedByMap, (x, y, z), Array.concat(arr, [hash(opt)]))
+    }
+    switch Belt.HashMap.get(supportsMap, opt) {
+    | None => Belt.HashMap.set(supportsMap, opt, [hash((x, y, z))])
+    | Some(arr) => Belt.HashMap.set(supportsMap, opt, Array.concat(arr, [hash((x, y, z))]))
     }
   })
 })
 
-let values = Belt.HashMap.valuesToArray(map)->Array.flat
-let res = Belt.HashMap.reduce(map, 0, (acc, _key, value) => {
+let values = Belt.HashMap.valuesToArray(supportsMap)->Array.flat
+let reverseLookup = Map.make()
+let totalRemovableBricks = Belt.HashMap.reduce(supportsMap, 0, (acc, key, value) => {
+  Map.set(reverseLookup, hash(key), key)
   let unique = Array.map(value, h => {
     Array.filter(values, v => v == h)->Array.length - 1
   })->Array.every(v => v > 0)
@@ -108,4 +120,39 @@ let res = Belt.HashMap.reduce(map, 0, (acc, _key, value) => {
   unique || empty ? acc + 1 : acc
 })
 
-Js.log2("Part 1", res)
+let rec countDisintegrated = (coords, disintegrated, first) => {
+  let isSupported =
+    first ||
+    switch Belt.HashMap.get(supportedByMap, coords) {
+    // Is supported by the ground
+    | None => true
+    // Check if this brick is not supported by any other not disintegrated brick
+    | Some(supportedBy) => Array.every(supportedBy, item => Set.has(disintegrated, item))
+    }
+
+  switch isSupported {
+  | false => 0
+  | true =>
+    Set.add(disintegrated, hash(coords))
+    switch Belt.HashMap.get(supportsMap, coords) {
+    | None => 0
+    | Some(children) =>
+      Array.filterMap(children, child => Map.get(reverseLookup, child))
+      ->Array.map(a => {
+        countDisintegrated(a, disintegrated, false)
+      })
+      ->Array.reduce(0, \"+")
+    }
+  }
+}
+
+let totalDisintegrated = Array.map(settled, brick => {
+  let (pos, _) = brick
+  let disintegrated = Set.make()
+  let _ = countDisintegrated(pos, disintegrated, true)
+
+  Set.size(disintegrated) - 1
+})->Array.reduce(0, \"+")
+
+Js.log2("Part 1", totalRemovableBricks)
+Js.log2("Part 2", totalDisintegrated)
